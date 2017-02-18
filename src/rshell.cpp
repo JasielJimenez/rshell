@@ -21,11 +21,11 @@ int main(int argc, char** argv)
 
  char name2[200];
  size_t size = 199;
- gethostname(name2,size);	//FIX THIS
+ gethostname(name2,size); //extra credit
 
  while(1)
  {
-	cout << name1 << "@" << name2  << "$ ";
+	cout << name1 << "@" << name2  << "$ "; //prints login and host info
 	getline(cin, cLine);
 
 	if(cLine == "exit") //checks to see if only exit is inputted
@@ -42,7 +42,6 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	//cout << cLine << endl;
 	
 	object.split(cLine);	//splits the string into tokens
 

@@ -26,7 +26,7 @@ void CommandLine::split(string comLine)
 	setCounter(num);
 	this->comLine = comLine;
 	Symbol obj;
-	for(unsigned int i = 0; i < comLine.size(); i++)
+	for(unsigned int i = 0; i < comLine.size(); i++) //puts connectors into vector
 	{
 		if(comLine.at(i) == ';')
 		{
@@ -60,7 +60,7 @@ void CommandLine::split(string comLine)
 	//cout << endl;
 
 	char* cstring = new char [comLine.size() + 1];
-	strcpy(cstring, comLine.c_str());
+	strcpy(cstring, comLine.c_str()); //converts string into cstring
 
 
 	vector<char*> vecChar;
@@ -91,9 +91,8 @@ void CommandLine::split(string comLine)
 	}
 
 	int pCharSize = vecChar.size();
-	cout << pCharSize << endl;
 	char** pointChar = new char*[vecChar.size()+1];
-	for(unsigned int y = 0; y < vecChar.size(); y++)
+	for(unsigned int y = 0; y < vecChar.size(); y++) //converts vector to char**
 	{
 		pointChar[y] = vecChar[y];
 
@@ -103,7 +102,7 @@ void CommandLine::split(string comLine)
 
 	pointChar[vecChar.size()] = NULL;
 	
-	for(unsigned int u = 0; u < connect.size(); u++)
+	for(unsigned int u = 0; u < connect.size(); u++) //clears connect vector
 	{
 		connect.pop_back();
 	}
@@ -131,7 +130,7 @@ void Symbol::Reader(char** pointChar, int pCharSize, vector<string> connect)
 		comWorked = temp.run(pointChar);
 		cout << comWorked << endl;
 		cout << "comWorked up (1 is true, 0 is false)" << endl;
-		if(connect.size() > 0)
+		if(connect.size() > 0) //goes through here only if there are connectors
 		{
 			string currRead = connect.at(counter);
 			cout << currRead << endl;
@@ -159,10 +158,10 @@ void Symbol::Reader(char** pointChar, int pCharSize, vector<string> connect)
 
 void Symbol::semicolon()
 {
-	return;
+	return;		//implement next command
 }
 
-void Symbol::ampersand(bool comWorked)
+void Symbol::ampersand(bool comWorked) //implement next command only if last command succeeded
 {
 	if(comWorked == false)
 	{
@@ -170,7 +169,7 @@ void Symbol::ampersand(bool comWorked)
 	}	
 }
 
-void Symbol::doubleLine(bool comWorked)
+void Symbol::doubleLine(bool comWorked) //implement next command only if last command failed
 {
 	if(comWorked == true)
 	{
@@ -178,7 +177,7 @@ void Symbol::doubleLine(bool comWorked)
 	}
 }
 
-bool Command::run(char** pointChar)
+bool Command::run(char** pointChar) //run commands correctly
 {	
 	//char **pointer = malloc(bufsize * sizeof(pointer*));
 	//char *token;
@@ -195,7 +194,7 @@ bool Command::run(char** pointChar)
 	cout << pid << endl;
 	if(pid == 0)
 	{
-		if(execvp(pointChar[0],pointChar) == -1) //FINISH
+		if(execvp(pointChar[0],pointChar) == -1)
 		{
 			perror("execvp error");
 			return false;
