@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<string>
 #include<stdlib.h>
 #include<string.h>
 #include<sys/wait.h>
@@ -18,13 +19,13 @@ int main(int argc, char** argv)
  char* name1;
  name1 = getlogin();
 
- char* name2;
- size_t size = 0;
+ char name2[200];
+ size_t size = 199;
  gethostname(name2,size);	//FIX THIS
 
  while(1)
  {
-	cout << name1 << "@" << name2 << "$ ";
+	cout << name1 << "@" << name2  << "$ ";
 	getline(cin, cLine);
 
 	if(cLine == "exit") //checks to see if only exit is inputted
@@ -33,7 +34,7 @@ int main(int argc, char** argv)
         }
 
 
-	for(int i = 0; i < cLine.size(); i++)	//checks for comment symbol
+	for(unsigned int i = 0; i < cLine.size(); i++)	//checks for comment symbol
 	{
 		if (cLine.at(i) == '#')
 		{
@@ -41,7 +42,7 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	cout << cLine << endl;
+	//cout << cLine << endl;
 	
 	object.split(cLine);	//splits the string into tokens
 

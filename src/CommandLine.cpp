@@ -26,7 +26,7 @@ void CommandLine::split(string comLine)
 	setCounter(num);
 	this->comLine = comLine;
 	Symbol obj;
-	for(int i = 0; i < comLine.size(); i++)
+	for(unsigned int i = 0; i < comLine.size(); i++)
 	{
 		if(comLine.at(i) == ';')
 		{
@@ -53,15 +53,14 @@ void CommandLine::split(string comLine)
 	}
 
 	
-	for(int x = 0; x < connect.size(); x++)
-	{
-		cout << connect.at(x) << endl;
-	}
-	cout << endl;
+	//for(int x = 0; x < connect.size(); x++)
+	//{
+	//	cout << connect.at(x) << endl;
+	//}
+	//cout << endl;
 
 	char* cstring = new char [comLine.size() + 1];
 	strcpy(cstring, comLine.c_str());
-
 
 
 	vector<char*> vecChar;
@@ -71,8 +70,14 @@ void CommandLine::split(string comLine)
 	while(temp != NULL)
 	{
 		string str(temp);
-
-		//cout << str << endl;		
+		str = str + "\0";
+		size_t p = str.find_first_not_of(" \t");
+		str.erase(0,p);
+		p = str.find_last_not_of(" \t");
+		if(string::npos != p)
+		{
+			str.erase(p + 1);
+		}	
 
 		strcpy(temp2, str.c_str());
 
@@ -84,18 +89,21 @@ void CommandLine::split(string comLine)
 
 		temp = strtok(NULL,";||&&");
 	}
-	
+
+	int pCharSize = vecChar.size();
+	cout << pCharSize << endl;
 	char** pointChar = new char*[vecChar.size()+1];
-	for(int y = 0; y < vecChar.size(); y++)
+	for(unsigned int y = 0; y < vecChar.size(); y++)
 	{
 		pointChar[y] = vecChar[y];
-	}
-	
-	//obj.Reader(pointChar,connect);
+
+	}	
+	pointChar[vecChar.size()] = '\0';
+	obj.Reader(pointChar,pCharSize,connect);
 
 	pointChar[vecChar.size()] = NULL;
 	
-	for(int u = 0; u < connect.size(); u++)
+	for(unsigned int u = 0; u < connect.size(); u++)
 	{
 		connect.pop_back();
 	}
@@ -114,29 +122,39 @@ void CommandLine::split(string comLine)
 	//delete cstring;
 }
 
-void Symbol::Reader(char** pointChar, vector<string> connect)
+void Symbol::Reader(char** pointChar, int pCharSize, vector<string> connect)
 {
-	bool comWorked = true;
+	bool comWorked = false;
 	Command temp;
-	comWorked = temp.run(pointChar);
-	string currRead = connect.at(counter);
-	if(currRead == ";")
+	for(int x = 0; x < pCharSize; x++)
 	{
-		semicolon();
+		comWorked = temp.run(pointChar);
+		cout << comWorked << endl;
+		cout << "comWorked up (1 is true, 0 is false)" << endl;
+		if(connect.size() > 0)
+		{
+			string currRead = connect.at(counter);
+			cout << currRead << endl;
+			cout << "currRead up" << endl;
+			if(currRead == ";")
+			{
+				semicolon();
+			}
+			else if(currRead == "&&")
+			{
+				ampersand(comWorked);
+			}
+			else if(currRead == "||")
+			{
+				doubleLine(comWorked);
+			}
+			else if(currRead == "exit")
+			{
+				exit(0);
+			}
+			updateCounter();
+		}
 	}
-	else if(currRead == "&&")
-	{
-		ampersand(comWorked);
-	}
-	else if(currRead == "||")
-	{
-		doubleLine(comWorked);
-	}
-	else if(currRead == "exit")
-	{
-		exit(0);
-	}
-	updateCounter();
 }
 
 void Symbol::semicolon()
@@ -165,7 +183,7 @@ bool Command::run(char** pointChar)
 	//char **pointer = malloc(bufsize * sizeof(pointer*));
 	//char *token;
 	pid_t pid;
-	pid_t waitPid;	
+	//pid_t waitPid;	
 	int temp;	
 	
 	//if (!tokens) {
@@ -174,21 +192,28 @@ bool Command::run(char** pointChar)
 	//}
 	
 	pid = fork();
+	cout << pid << endl;
 	if(pid == 0)
 	{
 		if(execvp(pointChar[0],pointChar) == -1) //FINISH
 		{
-			perror("error");
+			perror("execvp error");
+			return false;
 		}
 	}
 	else if(pid < 0)
 	{
-		perror("error");
+		perror("fork error");
+		return false;
 	}
 	else
 	{
 		//waitPid = waitpid(pid, &temp, WUNTRACED);
 		//while (!WIFEXITED(temp) && !WIFSIGNALED(temp));
+		if (waitpid(pid, &temp, 0) == -1)
+		{
+			perror("waitpid error");
+		}
 	}
 	return true;
 }

@@ -19,7 +19,7 @@ class CommandLine {
 
 class Symbol : public CommandLine {
  public:
- void Reader(char** pointChar,vector<string> connect); //Reads in a connector and calls function
+ void Reader(char** pointChar,int pCharSize,vector<string> connect); //Reads in a connector and calls function
  void semicolon(); //deals with semicolons
  void ampersand(bool comWorked); //deals with ampersands
  void doubleLine(bool comWorked); //deals with double lines
