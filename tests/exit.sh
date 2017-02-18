@@ -1,3 +1,2 @@
-#!/bin/bash
-exit
-echo "hello"; exit
+#!/bin/sh
+../bin/rshell < exit_test

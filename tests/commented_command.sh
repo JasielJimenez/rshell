@@ -1,3 +1,2 @@
- #hello
-#goodbye; ls; mkdir blah
-echo "hi" && ls  #hi
+#!/bin/sh
+../rshell < commented_command_test

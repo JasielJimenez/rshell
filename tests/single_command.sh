@@ -1,4 +1,2 @@
-#!/bin/bash
-echo "hello world"
-ls
-mkdir erase
+#!/bin/sh
+../bin/rshell < multi_command_test
