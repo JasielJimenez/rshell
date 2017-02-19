@@ -3,10 +3,7 @@ CFLAGS = -Wall -Werror -ansi -pedantic
 
 all:
 	mkdir -p ./bin
-	$(CC) $(CFLAGS) ./src/main.cpp -o ./bin/rshell
+	$(CC) $(CFLAGS) ${PWD}/src/rshell.cpp ${PWD}/src/CommandLine.cpp -o ${PWD}/bin/rshell
 
 rshell:
-	$(CC) $(CFLAGS) ./src/rshell.cpp
-
-CommandLine:
-	$(CC) $(CFLAGS) ./src/CommandLine.cpp
+	$(CC) $(CFLAGS) ${PWD}/src/rshell.cpp -o ${PWD}/bin/rshell
