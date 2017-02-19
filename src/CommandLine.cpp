@@ -231,7 +231,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 	{
 		//char** pointChar = new char*[pCharSize];
 		cout << "var is " << var << endl;
-		for(unsigned int y = var; y < vecChar.size(); y++)
+		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)
 		{
 			if(vecChar[y] == "\0")
 			{
@@ -246,7 +246,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			{
 				string st_temp = vecChar[y];
 				char* ch_temp = (char *)st_temp.c_str();
-				pointChar[y] = ch_temp;
+				pointChar[z] = ch_temp;
 			}
 		}
 		//pointChar[var] = '\0';
@@ -302,10 +302,10 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		}
 		adjSize--;
 		track = trackCount + 1;
-		for(int i = trackCount, j = 0; i < adjSize; i++,j++)
-		{
-			pointChar[j] = pointChar[i] + 1;
-		}
+	//	for(int i = trackCount, j = 0; i < adjSize; i++,j++)
+	//	{
+	//		pointChar[j] = pointChar[i] + 1;
+	//	}
 	}
 }
 
