@@ -61,14 +61,15 @@ void CommandLine::split(string comLine)
 	
 
 int w = 0;
-
+string store;
 	char* cstring = new char [comLine.size() + 1];
 	strcpy(cstring, comLine.c_str()); 		//converts string into cstring
 
-	vector<string> vecChar;
+        vector<string> vecChar;
+	//vector<char*> vecChar;
 	char* pointer = strtok(cstring," ;||&&");
 	char* temp = pointer;
-	char* temp2 = new char [comLine.size() + 1];
+	//char* temp2 = new char [comLine.size() + 1];
 	while(temp != NULL)
 	{
 		string str(temp);		//Converts cstring to string
@@ -85,34 +86,36 @@ int w = 0;
 
 	
 		if(str == "%")
-		{	
-			temp2 = NULL;
-			cout << temp2 << endl;
-			vecChar.push_back(temp2);
-			temp = strtok(NULL," ;||&&");
-		`}
-		else
-		{
-			strcpy(temp2, str.c_str()); 		//converts string to cstring
+		 {	
+		 	//temp2 = '\0';
+//		 	cout << "BLAH BLAH " << endl;
+		 	vecChar.push_back("\0");
+		 }
+		 else
+		 {
+			//strcpy(temp2, str.c_str()); 		//converts string to cstring
 
-			cout << temp2 << "!" << endl;
+//			cout << str << "!" << endl;
 
-			vecChar.push_back(temp2);
+	//		const char * b =  str.c_str();
+			vecChar.push_back( str   );
 
-if(vecChar.size() > 1)
-{
-cout << "IN WHILE LOOP" << endl;
-cout << vecChar.at(0) << " " << vecChar.at(1) << endl;
-w++;
-}
-			temp = strtok(NULL," ;||&&");
+// --------------------------- BLAH BLAH HI -------------------------
+//			if(vecChar.size() > 1)
+//			{
+//				cout << "IN WHILE LOOP" << endl;
+//				cout << vecChar.at(0) << " " << vecChar.at(1) << endl;
+//				w++;
+//			}
+// -----------------------------------------------------------------
 		}
+		temp = strtok(NULL," ;||&&");
 	}
-	
-	cout << vecChar.at(0) << " " << vecChar.at(1) << endl;
-	temp2 = NULL;
-	vecChar.push_back(temp2);
-	
+		
+	//cout << vecChar.at(0) << " " << vecChar.at(1) << endl;
+	//temp2 = NULL;
+	//vecChar.push_back("\0");
+		
 	cout << vecChar.size() << endl << endl;
 	for (int h = 0; h < vecChar.size(); h++)
 	{
@@ -154,16 +157,20 @@ w++;
 	//}
 
 
+	//CONVERT STRING TO CHAR*
+
 	int pCharSize = vecChar.size() + 1;
 	char** pointChar = new char*[vecChar.size()+1];
 	for(unsigned int y = 0; y < vecChar.size(); y++) //converts vector to char**
 	{
-		pointChar[y] = vecChar[y];
+		string st_temp = vecChar[y];
+		char * blah = (char *)st_temp.c_str();
+		pointChar[y] = blah;
 
 	}	
 	pointChar[vecChar.size()] = '\0';
 	
-	//obj.Reader(pointChar,pCharSize,connect); //calls the reader function
+	obj.Reader(pointChar,pCharSize,connect); //calls the reader function
 	
 	//ipointChar[vecChar.size()] = NULL;	
 
