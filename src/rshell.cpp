@@ -25,7 +25,7 @@ int main(int argc, char** argv)
  while(1)
  {
 	CommandLine object;
-	cout << name1 << "@" << name2  << "$ BLAH "; //prints login and host info	//MAKE SURE TO FIX
+	cout << name1 << "@" << name2  << " $ "; //prints login and host info	//MAKE SURE TO FIX
 	getline(cin, cLine);
 
 	if(cLine == "exit") //checks to see if only exit is inputted
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	int g = cLine.size() - 1;
+	unsigned int g = cLine.size() - 1;
 	int e = 0;
 	string newStr = cLine;
 	for(unsigned int j = 0; j < g; j++)	//Adds % character to separate commands
@@ -52,9 +52,7 @@ int main(int argc, char** argv)
 			newStr = newStr.substr(0,j + e);
 			newStr = newStr + " %";
 			newStr = newStr + cLine.substr(j, cLine.size() - j);
-			//cLine = newStr;
-			//e = j + 2;
-			cout << newStr << endl;
+			
 			e = e + 2;
 		}
 	}

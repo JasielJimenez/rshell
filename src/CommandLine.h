@@ -21,8 +21,8 @@ class Symbol : public CommandLine {
  public:
  void Reader(vector<string> vecChar,vector<string> connect); //Reads in a connector and calls function
  void semicolon(); //deals with semicolons
- void ampersand(bool comWorked); //deals with ampersands
- void doubleLine(bool comWorked); //deals with double lines
+ bool ampersand(bool comWorked); //deals with ampersands
+ bool doubleLine(bool comWorked); //deals with double lines
 };
 
 class Command : public CommandLine {
