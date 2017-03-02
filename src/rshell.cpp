@@ -29,8 +29,24 @@ void nextStep(string cLine)
                e = e + 2;
         }
  }
- object.split(newStr);
+ int f = 0;
+ //int f2 = 0;
+ int h = newStr.size();
+ string newStr2 = newStr;
+ for(unsigned int k = 0; k < h; k++)
+ {
+	if(newStr.at(k) == '(' || newStr.at(k) == ')')	//Adds % character to separate parentheses from commands
+	{
+		newStr2 = newStr2.substr(0, k + f);
+		newStr2 = newStr2 + " ";					//IF WE ARE KEEPING IN PARENTHESES, DO WE NEED PERCENT SIGN?
+		newStr2 = newStr2 + newStr.substr(k, newStr.size() - k);	//NEED SPACES ON RIGHT SIDE OF PARENTHESES
+		cout << newStr2 << endl;
+		f = f + 1;
+	}
+ }
+ //object.split(newStr);
 }
+
 
 
 int main(int argc, char** argv)
@@ -65,7 +81,7 @@ int main(int argc, char** argv)
 	}
 
 
-	for(unsigned int a = 0; a < cLine.size(); a++)
+	for(unsigned int a = 0; a < cLine.size(); a++)	//checks for uneven amount of parentheses
         {
                 if(cLine.at(a) == '(')
                 {
@@ -73,9 +89,9 @@ int main(int argc, char** argv)
                         {
 				if(cLine.at(b) == ')')
 				{
-					cout << "hello" << endl;	
+					break;	
 				}
-				else
+				else if(b == cLine.size() - 1)
 				{
 					perror("Uneven amount of parentheses");
 					exit(0);
@@ -83,6 +99,26 @@ int main(int argc, char** argv)
                         }
                 }
         }
+
+	for(unsigned int c = 0; c < cLine.size(); c++) //checks for uneven amount of brackets
+        {
+                if(cLine.at(c) == '[')
+                {
+                        for(unsigned int d = c + 1; d < cLine.size(); d++)
+                        {
+                                if(cLine.at(d) == ']')
+                                {
+                                        break;
+                                }
+                                else if(d == cLine.size() - 1)
+                                {
+                                        perror("Uneven amount of parentheses");
+                                        exit(0);
+                                }
+                        }
+                }
+        }
+
 	
 	nextStep(cLine);
 

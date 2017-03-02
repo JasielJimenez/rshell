@@ -5,6 +5,8 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "CommandLine.h"
 
@@ -116,7 +118,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		{
 			exit(0);
 		}		
-		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)
+		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)	//Fills char**, y is used to keep track of the vector, z is used to keep track of the char**
 		{
 			if(vecChar[y] == "\0")
 			{
@@ -240,3 +242,59 @@ bool Command::run(char** pointChar, int track) //run commands correctly
 	}
 	return true;
 }
+
+
+//bool Command::test(string test)	//NOT SURE WHAT TO PASS IN
+//{
+//	for(int i = 0; i < test.size(); i++)
+//	{
+//		if(test.at(i) == "-d"
+//		{
+//			test_flag = "-d"
+//		}
+//	}
+//
+//	string test_flag;
+//
+//	struct stat s;
+//	int i = stat(char* test, &s);
+//	if(i == -1)
+//	{
+//		perror()
+//		cout << "(False)" << endl;
+//		return false;
+//	}
+//
+//	if(test_flag == "-d")
+//	{
+//		if(S_ISDIR(s.st_mode))
+//		{
+//			cout << "(True)" << endl;
+//			return true;
+//		}
+//		else
+//		{
+//			cout << "(False)" << endl;
+//			return false;
+//		}
+//	}
+//	else if(test_flag == "-f")
+//	{
+//		if(S_ISREG(s.st_mode))
+//		{
+//			cout << "(True)" << endl;
+//			return true;
+//		}
+//		else
+//		{
+//			cout << "(False)" << endl;
+//			return false;
+//		}
+//	}
+//	else
+//	{
+//		cout << "(True)" << endl;
+//		return true;
+//	}
+//}
+
