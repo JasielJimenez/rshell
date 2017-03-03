@@ -28,6 +28,7 @@ class Symbol : public CommandLine {
 class Command : public CommandLine {
  public:
  bool run(char** pointChar, int track); //runs commands
+ bool test(string test);
 };
 
 //class Exit : CommandLine {

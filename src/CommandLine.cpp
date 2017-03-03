@@ -100,6 +100,10 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 {
 	
 	bool comWorked = false;
+
+	bool testExist = false;		//Used to skip executing the replaced test command
+	bool testWorked = false;
+
 	Command temp;
 	
 
@@ -118,6 +122,15 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		{
 			exit(0);
 		}		
+		if(vecChar.at(var) == "FALSE")
+		{
+			testExist = true;
+		}
+		else if(vecChar.at(var) == "TRUE")
+		{
+			testExist = true;
+			testWorked = true;
+		}
 		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)	//Fills char**, y is used to keep track of the vector, z is used to keep track of the char**
 		{
 			if(vecChar[y] == "\0")
@@ -137,7 +150,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			}
 		}		
 		
-		if(connectBool == true)
+		if(connectBool == true && testExist == false)	//DON'T KNOW IF THIS WORKS YET <-------------------------------------------------------------------------
 		{
 			comWorked = temp.run(pointChar, track);
 		}
@@ -149,24 +162,45 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			
 			string currRead = connect.at(counter);
 			
-
-			if(currRead == ";")
+			if(testExist == false)		//perform normally if test wasn't done
 			{
-				semicolon();
+				if(currRead == ";")
+				{
+					semicolon();
+				}
+				else if(currRead == "&&")
+				{
+					connectBool = ampersand(comWorked);
+				}
+				else if(currRead == "||")
+				{
+					connectBool = doubleLine(comWorked);
+				}
+				else if(currRead == "exit")
+				{
+					exit(0);
+				}
 			}
-			else if(currRead == "&&")
+			else				//use results of test to determine effects of connectors
 			{
-				connectBool = ampersand(comWorked);
+				if(currRead == ";")
+                                {
+                                        semicolon();
+                                }
+                                else if(currRead == "&&")
+                                {
+                                        connectBool = ampersand(testWorked);
+                                }
+                                else if(currRead == "||")
+                                {
+                                        connectBool = doubleLine(testWorked);
+                                }
+                                else if(currRead == "exit")
+                                {
+                                        exit(0);
+                                }
+	
 			}
-			else if(currRead == "||")
-			{
-				connectBool = doubleLine(comWorked);
-			}
-			else if(currRead == "exit")
-			{
-				exit(0);
-			}
-			
 		}
 		counter++;
 		trackCount = track;
@@ -178,6 +212,8 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		adjSize--;
 		track = trackCount + 1;
 	
+	testWorked = false;
+	testExist = false;
 	}
 }
 
@@ -244,57 +280,71 @@ bool Command::run(char** pointChar, int track) //run commands correctly
 }
 
 
-//bool Command::test(string test)	//NOT SURE WHAT TO PASS IN
-//{
-//	for(int i = 0; i < test.size(); i++)
-//	{
-//		if(test.at(i) == "-d"
-//		{
-//			test_flag = "-d"
-//		}
-//	}
-//
-//	string test_flag;
-//
-//	struct stat s;
-//	int i = stat(char* test, &s);
-//	if(i == -1)
-//	{
-//		perror()
-//		cout << "(False)" << endl;
-//		return false;
-//	}
-//
-//	if(test_flag == "-d")
-//	{
-//		if(S_ISDIR(s.st_mode))
-//		{
-//			cout << "(True)" << endl;
-//			return true;
-//		}
-//		else
-//		{
-//			cout << "(False)" << endl;
-//			return false;
-//		}
-//	}
-//	else if(test_flag == "-f")
-//	{
-//		if(S_ISREG(s.st_mode))
-//		{
-//			cout << "(True)" << endl;
-//			return true;
-//		}
-//		else
-//		{
-//			cout << "(False)" << endl;
-//			return false;
-//		}
-//	}
-//	else
-//	{
-//		cout << "(True)" << endl;
-//		return true;
-//	}
-//}
+bool Command::test(string test)	
+{
+	string test_flag;
+	if(test.find("-d") != string::npos)
+	{
+		test_flag = "-d";
+	} 
+	else if(test.find("-f") != string::npos)
+	{
+		test_flag = "-f";
+	}
+	
+	if(test.find("-d") == string::npos && test.find("-f") == string::npos)
+	{
+		test_flag = "-e";
+	}
+
+	cout << test_flag << endl;
+
+	string path;
+	//path =  
+
+	char* charTest;
+	strcpy(charTest, path.c_str());
+
+	struct stat s;
+	int i = stat(charTest, &s);
+	if(i == -1)
+	{
+		perror("Stat Failure");
+		cout << "(False)" << endl;
+		return false;
+	}
+
+	if(test_flag == "-d")
+	{
+		if(S_ISDIR(s.st_mode))
+		{
+			cout << "(True)" << endl;
+			return true;
+		}
+		else
+		{
+			cout << "(False)" << endl;
+			return false;
+		}
+	}
+	else if(test_flag == "-f")
+	{
+		if(S_ISREG(s.st_mode))
+		{
+			cout << "(True)" << endl;
+			return true;
+		}
+		else
+		{
+			cout << "(False)" << endl;
+			return false;
+		}
+	}
+	else
+	{
+		cout << "(True)" << endl;
+		return true;
+	}
+	return false;
+}
 
