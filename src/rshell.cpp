@@ -86,7 +86,7 @@ void nextStep(string cLine)
 	{
 		if(x < newStr2.size() - 4)
 		{
-			if(newStr2.at(x + 1) = 'e' && newStr2.at(x + 2) = 's' && newStr2.at(x + 3) = 't' && newStr2.at(x + 4) = ' ')
+			if(newStr2.at(x + 1) == 'e' && newStr2.at(x + 2) == 's' && newStr2.at(x + 3) == 't' && newStr2.at(x + 4) == ' ')
 			{
 				
 			}
