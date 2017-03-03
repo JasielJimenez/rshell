@@ -35,16 +35,17 @@ void nextStep(string cLine)
  string newStr2 = newStr;
  for(unsigned int k = 0; k < h; k++)
  {
-	if(newStr.at(k) == '(' || newStr.at(k) == ')')	//Adds % character to separate parentheses from commands
+	if(newStr.at(k) == '(' || newStr.at(k) == ')' || newStr.at(k) == '[' || newStr.at(k) == ']')	//Adds % character to separate parentheses from commands
 	{
 		newStr2 = newStr2.substr(0, k + f);
 		newStr2 = newStr2 + " ";					//IF WE ARE KEEPING IN PARENTHESES, DO WE NEED PERCENT SIGN?
-		newStr2 = newStr2 + newStr.substr(k, newStr.size() - k);	//NEED SPACES ON RIGHT SIDE OF PARENTHESES
-		cout << newStr2 << endl;
-		f = f + 1;
+		newStr2 = newStr2 + newStr.substr(k, 1);
+		newStr2 = newStr2 + " ";
+		newStr2 = newStr2 + newStr.substr(k + 1, newStr.size() - k);	//NEED SPACES ON RIGHT SIDE OF PARENTHESES
+		f = f + 2;
 	}
  }
- //object.split(newStr);
+ object.split(newStr);
 }
 
 
