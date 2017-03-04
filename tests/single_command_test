@@ -1,4 +1,12 @@
 #!/bin/bash
-echo "hello world"
-ls
+echo hello world
 mkdir erase
+echo its alive!
+mkdir krabbyPattySecretFormula
+echo am i on?
+echo tests successful
+echo skynet activate
+mkdir proofAliensExist
+mkdir normieMemes
+ls
+exit

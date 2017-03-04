@@ -1,0 +1,12 @@
+#!/bin/bash
+test -f /home/csmajs/jjime038/src/rshell/src/rshell.cpp && echo “rshell.cpp exists”
+[ -f /home/csmajs/jjime038/src/rshell/src/rshell.cpp ] && echo “rshell.cpp exists”
+test -d /home/csmajs/jjime038/src/rshell/src && echo “src exists”
+[ -d /home/csmajs/jjime038/src/rshell/src ] && echo “src exists”
+test -e /home/csmajs/jjime038/src/rshell && echo “rshell exists”
+[ -e /home/csmajs/jjime038/src/rshell ] && echo “rshell exists”
+test /home/csmajs/jjime038/src && echo “src exists”
+[ /home/csmajs/jjime038/src ] && echo “src exists”
+( test /home/csmajs/jjime038/src && echo “src exists” ) && ( mkdir pizza && echo pizza done )
+test /home/csmajs/jjime038/src && ( echo “src exists” && mkdir pizza ) && echo pizza done
+exit

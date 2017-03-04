@@ -1,3 +1,12 @@
 #!/bin/bash
-exit
 echo "hello"; exit
+ls && exit
+mkdir papers || exit
+mkdir checkup; ls; echo done; exit
+echo next; ( mkdir next && ls ) || exit
+echo lets; echo get; echo going; exit
+echo print; exit; echo no print
+exit || echo try again; exit
+( echo working? && echo nope ) && exit
+test -e /home/csmajs/jjime038/src/rshell/src || exit
+exit
