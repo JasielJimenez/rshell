@@ -15,6 +15,7 @@ class CommandLine {
  //void setCounter(int num); //sets counter to zero
  //void updateCounter(); //increments counter by one after reading a command
  void split(string comLine); //splits comLine into commands and connectors
+ void precedence(string comLine);
 };
 
 class Symbol : public CommandLine {
@@ -29,11 +30,7 @@ class Command : public CommandLine {
  public:
  bool run(char** pointChar, int track); //runs commands
  bool test(string test);
+ //bool precedence(string line);
 };
-
-//class Exit : CommandLine {
-// public:
-// ExitCom(); //exits
-//};
 
 #endif

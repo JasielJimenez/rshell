@@ -12,10 +12,58 @@
 
 using namespace std;
 
+//void precedence(string line, CommandLine tempObj)
+//{
+//	int start;
+//        for(unsigned int j = 0; j < line.size(); j++)
+//        {
+//                if(line.at(j) == '(' && level == 0)
+//                {
+//                        level++;
+//			line = line.substr(j,line.size() - 1);
+//                        precedence(line,level);
+//                }
+//                else if(line.at(j) == '(')
+//		{
+//			level++;
+//		}
+//		if(line.at(j) == ')')
+//                {
+//                        level--;
+//                        if(level == 0)
+//                        {
+//				//run
+//			}
+//		}
+//	}
+//	for(unsigned int j = 0; j < line.size(); j++)
+//	{
+//		if(line.at(j) == '(' && line.at(j + 1) != '(')
+//		{
+//			for(unsigned int k = j; k < line.size(); k++)
+//			{
+//				if(line.at(k) == '(' || line.at(k) == ')')
+//				{
+//					string temp = line.substr(j, k - j);
+//					tempObj.split(temp);
+//					
+//				}
+//			}
+//		}
+//		else if(line.at(j) == '(' && line.at(j + 1) == '(')
+//		{
+//			
+//		}
+//	}
+//}
+
+
+
 void nextStep(string cLine)
 {
  CommandLine object;
- unsigned int g = cLine.size() - 1;
+//Adds a % character to separate from connectors------------------------------------------------------------------------------------ 
+unsigned int g = cLine.size() - 1;
  int e = 0;
  string newStr = cLine;
  for(unsigned int j = 0; j < g; j++)     //Adds % character to separate commands from connectors
@@ -29,14 +77,20 @@ void nextStep(string cLine)
                e = e + 2;
         }
  }
+
+//Isolates parentheses--------------------------------------------------------------------------------------------------------------------------------
  int f = 0;
- //int f2 = 0;
- int h = newStr.size();
+ bool isParen = false;
+ unsigned int h = newStr.size();
  string newStr2 = newStr;
  for(unsigned int k = 0; k < h; k++)
  {
 	if(newStr.at(k) == '(' || newStr.at(k) == ')')// || newStr.at(k) == '[' || newStr.at(k) == ']')	//Adds % character to separate parentheses from commands
 	{
+		if(isParen == false)
+		{
+			isParen = true;
+		}
 		newStr2 = newStr2.substr(0, k + f);
 		newStr2 = newStr2 + " ";					//IF WE ARE KEEPING IN PARENTHESES, DO WE NEED PERCENT SIGN?
 		newStr2 = newStr2 + newStr.substr(k, 1);
@@ -45,13 +99,15 @@ void nextStep(string cLine)
 		f = f + 2;
 	}
  }
+
+//Finds either test or []-------------------------------------------------------------------------------------------------
  int start;
  int end;
  string testStore;
  string temptestString;
  bool result;
  Command testObject; 
- for(unsigned int x = 0; x < newStr2.size(); x++)	//Finds either test or [] and 
+ for(unsigned int x = 0; x < newStr2.size(); x++)
  {
 	if(newStr2.at(x) == '[')
 	{
@@ -61,24 +117,21 @@ void nextStep(string cLine)
 			if(newStr2.at(y) == ']')
 			{
 				end = y;
-				testStore = newStr2.substr(start, end - start + 1);
-
-				cout << testStore << endl;
+				testStore = newStr2.substr(start, end - start);
 
 				result = testObject.test(testStore);
-				//Replace [ -f /test/path] with either TRUE or FALSE
-				//temptestString = newStr2.substr(0, start);
-				//if(result == true)
-				//{
-				//	temptestString = temptestString + " TRUE ";
-				//}
-				//else
-				//{
-				//	temptestString = temptestString + " FALSE ";
-				//}
-				//temptestString = temptestString + newStr2.substr(end - start + 1; newStr2.size() - 1);
-				//newStr2 = temptestString;
-
+				temptestString = newStr2.substr(0, start);
+				if(result == true)
+				{
+					temptestString = temptestString + " TRUE ";
+				}
+				else
+				{
+					temptestString = temptestString + " FALSE ";
+				}
+				temptestString = temptestString + newStr2.substr(end - start + 1, newStr2.size() - 1);
+				newStr2 = temptestString;
+				break;
 			}
 		}
 	}
@@ -88,15 +141,61 @@ void nextStep(string cLine)
 		{
 			if(newStr2.at(x + 1) == 'e' && newStr2.at(x + 2) == 's' && newStr2.at(x + 3) == 't' && newStr2.at(x + 4) == ' ')
 			{
-				
+				for(unsigned int q = x; q < newStr2.size(); q++)
+				{
+					if(newStr2.at(q) == '%')
+					{
+						testStore = newStr2.substr(x + 5, q - x - 6);
+						result = testObject.test(testStore);
+						temptestString = newStr2.substr(0, x);
+                                		if(result == true)
+                                		{
+                                		        temptestString = temptestString + " TRUE ";
+                                		}
+                                		else
+                                		{
+                                		        temptestString = temptestString + " FALSE ";
+                                		}
+                                		temptestString = temptestString + newStr2.substr(q,newStr2.size() - 1);
+                                		newStr2 = temptestString;
+
+						break;
+					}
+					else if(q == newStr2.size() - 1)
+					{
+						testStore = newStr2.substr(x + 5, q - x - 4);
+						result = testObject.test(testStore);
+						temptestString = newStr2.substr(0, x);
+                               			if(result == true)
+                                		{
+                                        		temptestString = temptestString + " TRUE ";
+                                		}
+                                		else
+                                		{
+                                        		temptestString = temptestString + " FALSE ";
+                                		}
+                                		//temptestString = temptestString + newStr2.substr(q, newStr2.size() - 1);
+                                		newStr2 = temptestString;
+
+						break;
+					}
+				}
 			}
 		}
 	}
 	testStore = "";
  }
+ if(isParen == false)
+ {
+	object.split(newStr2); //Splits the string into tokens and then runs it -------------------------------------------------------------------------
+ }
+ else
+ {
+	object.precedence(newStr2);
+ }
 
- //object.split(newStr);
 }
+
 
 
 
@@ -163,7 +262,7 @@ int main(int argc, char** argv)
                                 }
                                 else if(d == cLine.size() - 1)
                                 {
-                                        perror("Uneven amount of parentheses");
+                                        perror("Uneven amount of brackets");
                                         exit(0);
                                 }
                         }
