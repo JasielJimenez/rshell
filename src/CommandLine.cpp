@@ -64,8 +64,6 @@ void CommandLine::split(string comLine)
 			str.erase(p + 1);
 		}	
 		
-
-
 	
 		if(str == "%")
 		 {	
@@ -73,11 +71,8 @@ void CommandLine::split(string comLine)
 		 }
 		 else
 		 {
-
-
 			vecChar.push_back( str   );
-
-		}
+		 }
 		temp = strtok(NULL," ;||&&");
 	}
 		
@@ -124,10 +119,12 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		}		
 		if(vecChar.at(var) == "FALSE")
 		{
+			cout << "(False)" << endl;
 			testExist = true;
 		}
 		else if(vecChar.at(var) == "TRUE")
 		{
+			cout << "(True)" << endl;
 			testExist = true;
 			testWorked = true;
 		}
@@ -247,16 +244,13 @@ bool Symbol::doubleLine(bool comWorked) //implement next command only if last co
 }
 
 bool Command::run(char** pointChar, int track) //run commands correctly
-{	
-	
+{		
 	pid_t pid;	
 	int temp;	
 	pid = fork();
-
 	
 	if(pid == 0)
-	{
-		
+	{		
 		if(execvp(pointChar[0],pointChar) == -1)
 		{
 			perror("execvp error");
@@ -283,7 +277,7 @@ bool Command::run(char** pointChar, int track) //run commands correctly
 bool Command::test(string test)	
 {
 	string test_flag;
-	if(test.find("-d") != string::npos)
+	if(test.find("-d") != string::npos) //Finding the flag
 	{
 		test_flag = "-d";
 	} 
@@ -299,10 +293,30 @@ bool Command::test(string test)
 
 	cout << test_flag << endl;
 
-	string path;
-	//path =  
+	string path;					//Trimming the string to leave only the path
+	for(unsigned int p = 0; p < test.size(); p++)
+	{
+		if(test.at(p) == '/')
+		{
+			path = test.substr(p,test.size() - p);
+			cout << "path: " << path << "!" << endl;
+			break;
+		}
+	}  
+	
+	//Removes leading whitespace --------------------------------------------------
+	size_t p = path.find_first_not_of(" \t");
+        path.erase(0,p);
+        p = path.find_last_not_of(" \t");
+        if(string::npos != p)
+       	{
+        	path.erase(p + 1);
+        }
+	//-----------------------------------------------------------------------------
 
-	char* charTest;
+	cout << "Removed ending whitespace:" << path << "!" << endl;
+
+	char* charTest = new char[path.size() + 1];
 	strcpy(charTest, path.c_str());
 
 	struct stat s;
@@ -310,7 +324,7 @@ bool Command::test(string test)
 	if(i == -1)
 	{
 		perror("Stat Failure");
-		cout << "(False)" << endl;
+		//cout << "(False)" << endl;
 		return false;
 	}
 
@@ -318,12 +332,12 @@ bool Command::test(string test)
 	{
 		if(S_ISDIR(s.st_mode))
 		{
-			cout << "(True)" << endl;
+			//cout << "(True)" << endl;
 			return true;
 		}
 		else
 		{
-			cout << "(False)" << endl;
+			//cout << "(False)" << endl;
 			return false;
 		}
 	}
@@ -331,18 +345,18 @@ bool Command::test(string test)
 	{
 		if(S_ISREG(s.st_mode))
 		{
-			cout << "(True)" << endl;
+			//cout << "(True)" << endl;
 			return true;
 		}
 		else
 		{
-			cout << "(False)" << endl;
+			//cout << "(False)" << endl;
 			return false;
 		}
 	}
 	else
 	{
-		cout << "(True)" << endl;
+		//cout << "(True)" << endl;
 		return true;
 	}
 	return false;

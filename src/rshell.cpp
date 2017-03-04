@@ -15,7 +15,8 @@ using namespace std;
 void nextStep(string cLine)
 {
  CommandLine object;
- unsigned int g = cLine.size() - 1;
+//Adds a % character to separate from connectors------------------------------------------------------------------------------------ 
+unsigned int g = cLine.size() - 1;
  int e = 0;
  string newStr = cLine;
  for(unsigned int j = 0; j < g; j++)     //Adds % character to separate commands from connectors
@@ -29,9 +30,11 @@ void nextStep(string cLine)
                e = e + 2;
         }
  }
+//--------------------------------------------------------------------------------------------------------------------------------
+
  int f = 0;
  //int f2 = 0;
- int h = newStr.size();
+ unsigned int h = newStr.size();
  string newStr2 = newStr;
  for(unsigned int k = 0; k < h; k++)
  {
@@ -45,13 +48,15 @@ void nextStep(string cLine)
 		f = f + 2;
 	}
  }
+
+//Finds either test or []-------------------------------------------------------------------------------------------------
  int start;
  int end;
  string testStore;
  string temptestString;
  bool result;
  Command testObject; 
- for(unsigned int x = 0; x < newStr2.size(); x++)	//Finds either test or [] and 
+ for(unsigned int x = 0; x < newStr2.size(); x++)
  {
 	if(newStr2.at(x) == '[')
 	{
@@ -61,24 +66,26 @@ void nextStep(string cLine)
 			if(newStr2.at(y) == ']')
 			{
 				end = y;
-				testStore = newStr2.substr(start, end - start + 1);
+				testStore = newStr2.substr(start, end - start);
 
-				cout << testStore << endl;
+				cout << "@" << testStore << "@" << endl;
 
 				result = testObject.test(testStore);
-				//Replace [ -f /test/path] with either TRUE or FALSE
-				//temptestString = newStr2.substr(0, start);
-				//if(result == true)
-				//{
-				//	temptestString = temptestString + " TRUE ";
-				//}
-				//else
-				//{
-				//	temptestString = temptestString + " FALSE ";
-				//}
-				//temptestString = temptestString + newStr2.substr(end - start + 1; newStr2.size() - 1);
-				//newStr2 = temptestString;
-
+				temptestString = newStr2.substr(0, start);
+				cout << "begin of temptest: " << temptestString << endl;
+				if(result == true)
+				{
+					temptestString = temptestString + " TRUE ";
+				}
+				else
+				{
+					temptestString = temptestString + " FALSE ";
+				}
+				cout << "continue: " << temptestString << endl; 
+				temptestString = temptestString + newStr2.substr(end - start + 1, newStr2.size() - 1);
+				newStr2 = temptestString;
+				cout << newStr2 << endl;
+				break;
 			}
 		}
 	}
@@ -88,14 +95,60 @@ void nextStep(string cLine)
 		{
 			if(newStr2.at(x + 1) == 'e' && newStr2.at(x + 2) == 's' && newStr2.at(x + 3) == 't' && newStr2.at(x + 4) == ' ')
 			{
-				
+				for(unsigned int q = x; q < newStr2.size(); q++)
+				{
+					if(newStr2.at(q) == '%')// || q == newStr2.size() - 1)// || newStr2.find('%') == string::npos)
+					{
+						testStore = newStr2.substr(x + 5, q - x - 6);
+						cout << "@" << testStore << "@" << endl;
+						result = testObject.test(testStore);
+						temptestString = newStr2.substr(0, x);
+                                		cout << "begin of temptest: " << temptestString << endl;
+                                		if(result == true)
+                                		{
+                                		        temptestString = temptestString + " TRUE ";
+                                		}
+                                		else
+                                		{
+                                		        temptestString = temptestString + " FALSE ";
+                                		}
+                                		cout << "continue: " << temptestString << endl;
+                                		temptestString = temptestString + newStr2.substr(q,newStr2.size() - 1);
+                                		newStr2 = temptestString;
+                                		cout << newStr2 << endl;
+
+						break;
+					}
+					else if(q == newStr2.size() - 1)
+					{
+						testStore = newStr2.substr(x + 5, q - x - 4);
+						cout << "!" << testStore << "!" << endl;
+						result = testObject.test(testStore);
+						temptestString = newStr2.substr(0, x);
+		                                cout << "begin of temptest: " << temptestString << endl;
+                               			if(result == true)
+                                		{
+                                        		temptestString = temptestString + " TRUE ";
+                                		}
+                                		else
+                                		{
+                                        		temptestString = temptestString + " FALSE ";
+                                		}
+                                		cout << "continue: " << temptestString << endl;
+                                		//temptestString = temptestString + newStr2.substr(q, newStr2.size() - 1);
+                                		newStr2 = temptestString;
+                                		cout << newStr2 << endl;
+
+						break;
+					}
+				}
 			}
 		}
 	}
 	testStore = "";
  }
 
- //object.split(newStr);
+ object.split(newStr2);
 }
 
 
