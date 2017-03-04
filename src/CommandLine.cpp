@@ -12,6 +12,24 @@
 
 using namespace std;
 
+bool parenWorked = false;
+bool global_connect = true;
+
+void CommandLine::precedence(string comLine)
+{
+	for(unsigned int j = 0; j < comLine.size(); j++)
+	{
+		if(j == 0)
+		{
+
+		}
+		if(comLine.at(j) == '(' && comLine.at(j + 1) != '(')
+		{
+
+		}
+	}
+}
+
 
 void CommandLine::split(string comLine)
 {
@@ -291,8 +309,6 @@ bool Command::test(string test)
 		test_flag = "-e";
 	}
 
-	cout << test_flag << endl;
-
 	string path;					//Trimming the string to leave only the path
 	for(unsigned int p = 0; p < test.size(); p++)
 	{
@@ -314,7 +330,6 @@ bool Command::test(string test)
         }
 	//-----------------------------------------------------------------------------
 
-	cout << "Removed ending whitespace:" << path << "!" << endl;
 
 	char* charTest = new char[path.size() + 1];
 	strcpy(charTest, path.c_str());

@@ -12,6 +12,53 @@
 
 using namespace std;
 
+//void precedence(string line, CommandLine tempObj)
+//{
+//	int start;
+//        for(unsigned int j = 0; j < line.size(); j++)
+//        {
+//                if(line.at(j) == '(' && level == 0)
+//                {
+//                        level++;
+//			line = line.substr(j,line.size() - 1);
+//                        precedence(line,level);
+//                }
+//                else if(line.at(j) == '(')
+//		{
+//			level++;
+//		}
+//		if(line.at(j) == ')')
+//                {
+//                        level--;
+//                        if(level == 0)
+//                        {
+//				//run
+//			}
+//		}
+//	}
+//	for(unsigned int j = 0; j < line.size(); j++)
+//	{
+//		if(line.at(j) == '(' && line.at(j + 1) != '(')
+//		{
+//			for(unsigned int k = j; k < line.size(); k++)
+//			{
+//				if(line.at(k) == '(' || line.at(k) == ')')
+//				{
+//					string temp = line.substr(j, k - j);
+//					tempObj.split(temp);
+//					
+//				}
+//			}
+//		}
+//		else if(line.at(j) == '(' && line.at(j + 1) == '(')
+//		{
+//			
+//		}
+//	}
+//}
+
+
+
 void nextStep(string cLine)
 {
  CommandLine object;
@@ -30,16 +77,20 @@ unsigned int g = cLine.size() - 1;
                e = e + 2;
         }
  }
-//--------------------------------------------------------------------------------------------------------------------------------
 
+//Isolates parentheses--------------------------------------------------------------------------------------------------------------------------------
  int f = 0;
- //int f2 = 0;
+ bool isParen = false;
  unsigned int h = newStr.size();
  string newStr2 = newStr;
  for(unsigned int k = 0; k < h; k++)
  {
 	if(newStr.at(k) == '(' || newStr.at(k) == ')')// || newStr.at(k) == '[' || newStr.at(k) == ']')	//Adds % character to separate parentheses from commands
 	{
+		if(isParen == false)
+		{
+			isParen = true;
+		}
 		newStr2 = newStr2.substr(0, k + f);
 		newStr2 = newStr2 + " ";					//IF WE ARE KEEPING IN PARENTHESES, DO WE NEED PERCENT SIGN?
 		newStr2 = newStr2 + newStr.substr(k, 1);
@@ -68,11 +119,8 @@ unsigned int g = cLine.size() - 1;
 				end = y;
 				testStore = newStr2.substr(start, end - start);
 
-				cout << "@" << testStore << "@" << endl;
-
 				result = testObject.test(testStore);
 				temptestString = newStr2.substr(0, start);
-				cout << "begin of temptest: " << temptestString << endl;
 				if(result == true)
 				{
 					temptestString = temptestString + " TRUE ";
@@ -81,10 +129,8 @@ unsigned int g = cLine.size() - 1;
 				{
 					temptestString = temptestString + " FALSE ";
 				}
-				cout << "continue: " << temptestString << endl; 
 				temptestString = temptestString + newStr2.substr(end - start + 1, newStr2.size() - 1);
 				newStr2 = temptestString;
-				cout << newStr2 << endl;
 				break;
 			}
 		}
@@ -97,13 +143,11 @@ unsigned int g = cLine.size() - 1;
 			{
 				for(unsigned int q = x; q < newStr2.size(); q++)
 				{
-					if(newStr2.at(q) == '%')// || q == newStr2.size() - 1)// || newStr2.find('%') == string::npos)
+					if(newStr2.at(q) == '%')
 					{
 						testStore = newStr2.substr(x + 5, q - x - 6);
-						cout << "@" << testStore << "@" << endl;
 						result = testObject.test(testStore);
 						temptestString = newStr2.substr(0, x);
-                                		cout << "begin of temptest: " << temptestString << endl;
                                 		if(result == true)
                                 		{
                                 		        temptestString = temptestString + " TRUE ";
@@ -112,20 +156,16 @@ unsigned int g = cLine.size() - 1;
                                 		{
                                 		        temptestString = temptestString + " FALSE ";
                                 		}
-                                		cout << "continue: " << temptestString << endl;
                                 		temptestString = temptestString + newStr2.substr(q,newStr2.size() - 1);
                                 		newStr2 = temptestString;
-                                		cout << newStr2 << endl;
 
 						break;
 					}
 					else if(q == newStr2.size() - 1)
 					{
 						testStore = newStr2.substr(x + 5, q - x - 4);
-						cout << "!" << testStore << "!" << endl;
 						result = testObject.test(testStore);
 						temptestString = newStr2.substr(0, x);
-		                                cout << "begin of temptest: " << temptestString << endl;
                                			if(result == true)
                                 		{
                                         		temptestString = temptestString + " TRUE ";
@@ -134,10 +174,8 @@ unsigned int g = cLine.size() - 1;
                                 		{
                                         		temptestString = temptestString + " FALSE ";
                                 		}
-                                		cout << "continue: " << temptestString << endl;
                                 		//temptestString = temptestString + newStr2.substr(q, newStr2.size() - 1);
                                 		newStr2 = temptestString;
-                                		cout << newStr2 << endl;
 
 						break;
 					}
@@ -147,9 +185,17 @@ unsigned int g = cLine.size() - 1;
 	}
 	testStore = "";
  }
+ if(isParen == false)
+ {
+	object.split(newStr2); //Splits the string into tokens and then runs it -------------------------------------------------------------------------
+ }
+ else
+ {
+	object.precedence(newStr2);
+ }
 
- object.split(newStr2);
 }
+
 
 
 
@@ -216,7 +262,7 @@ int main(int argc, char** argv)
                                 }
                                 else if(d == cLine.size() - 1)
                                 {
-                                        perror("Uneven amount of parentheses");
+                                        perror("Uneven amount of brackets");
                                         exit(0);
                                 }
                         }
