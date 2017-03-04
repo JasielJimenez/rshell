@@ -2,3 +2,11 @@
 ls; echo hello; mkdir why
 ls && echo hello && mkdir how
 ls || echo hello || mkdir huh
+ls; echo hello && mkdir what
+ls || echo hello; mkdir where
+ls && echo hello || mkdir when
+echo hey; echo how || echo where; echo are; echo you
+mkdir newdir && ls && echo done
+echo party?; mkdir party || echo nope || echo yeah
+mkdir firstfile &&  mkdir secondfile && ls
+exit

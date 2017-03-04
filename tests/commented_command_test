@@ -1,3 +1,12 @@
- #hello
-#goodbye; ls; mkdir blah
-echo "hi" && ls  #hi
+#!/bin/bash
+ls # echo hello
+# echo goodbye; ls; mkdir blah
+echo hi && ls #hi
+mkdir Menu || echo oops # echo done
+ls # mkdir schedule && echo overdue
+echo worth?; echo totes # echo nope
+mkdir games && echo play? # echo homework
+ls; echo here # echo where; echo there
+echo homework && echo done?; echo yep # echo hahaha
+mkdir library || echo again?; ls # echo obviously
+exit
