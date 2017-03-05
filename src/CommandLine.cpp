@@ -33,23 +33,40 @@ string trimElements(string original, string elmToTrim)
 void CommandLine::precedence(string comLine)
 {
 	int level = 0;
+	//cout << "comLine: " << comLine.size() << endl;
 	for(unsigned int j = 0; j < comLine.size(); j++)
 	{
-		if(j == 0 && comLine.at(j) != '(')
+		//cout << "j=" << j << endl;
+		//base case: no beginning parentheses
+		if(comLine.at(j) != '(')
 		{
 			for(unsigned int l = j; l < comLine.size(); l++)
 			{
-				//search for the first half of the perentheses
+				//runs everything before parentheses
 				if(comLine.at(l) == '(')
 				{
 					string temp = comLine.substr(j, l - j);
-					cout << "->" << temp << "!" << endl;
+					//cout << "->" << temp << "!" << endl;
 					split(temp);
-					continue;
+					j = l - 1; //Not + 1 to account for j++
+					//cout << "J = " << j << endl;
+					//cout << "L = " << l << endl;
+					break;
+				} //runs everything inside parentheses
+				else if(l == comLine.size() - 1)
+				{
+					//+ 1 accounts for size of entire string
+					string temp = comLine.substr(j, l - j + 1);
+					//cout << "->" << temp << "!" << endl;
+					split(temp);
+					j = l + 1;
+					//cout << "J = " << j << endl;
+					//cout << "L = " << l << endl;
+					break;
 				}
 			}
 		}
-		if(comLine.at(j) == '(' && comLine.at(j + 1) != '(')
+		else if(comLine.at(j) == '(')// && comLine.at(j + 1) != '(')
 		{
 			level++;
 			for(unsigned int k = j + 1; k < comLine.size(); k++)
@@ -61,15 +78,46 @@ void CommandLine::precedence(string comLine)
 				}
 				else if(comLine.at(k) == ')')
 				{
-					string temp = comLine.substr(j, k - j + 1);
-					cout << "temp:" << temp << "!" << endl;
-					continue;
-					//split(temp);
+					level--;
+					if(level == 0)
+					{
+						//cout << "k= " << k << endl;
+						string temp = comLine.substr(j + 1, k - j - 1);
+						//cout << "temp:" << temp << "!" << endl;
+						precedence(temp);
+						j = k + 1;
+						break;
+						//split(temp);
+					}
 				}
 			}
 		}
+//		else if(comLine.at(j) != '(')
+//		{
+//			for(unsigned int m = j; m < comLine.size(); m++)
+//			{
+//				if(comLine.at(m) == '(')
+//				{
+//					string temp = comLine.substr(j, m - j);
+//					split(temp);
+//					break;
+//				}
+//				else if(m == comLine.size() - 1)
+//				{
+//					cout << "pupper" << endl;
+//					string temp = comLine.substr(j, m - j + 1);
+//					split(temp);
+//					break;
+//				}
+//			}
+//		}	
 	}
 }
+
+//	if(global_connect == false)
+//	{
+	//	Don't run(before recursion)
+//	}
 
 
 void CommandLine::split(string comLine)
@@ -173,7 +221,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 	int pCharSize = vecChar.size() + 1;
 	int adjSize = pCharSize;
 	int var = 0;
-	bool connectBool = true;
+	//bool connectBool = true;
 	char** pointChar = new char*[pCharSize];
 
 	while(counter < connect.size() + 1)
@@ -191,12 +239,14 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		{
 			cout << "(False)" << endl;
 			testExist = true;
+			//global_connect = false;
 		}
 		else if(vecChar.at(var) == "TRUE")
 		{
 			cout << "(True)" << endl;
 			testExist = true;
 			testWorked = true;
+			//global_connect = true;
 		}
 		//Fills char**, y is used to keep track of the vector, z is used to keep track of the char**
 		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)
@@ -236,11 +286,11 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			}
 		}		
 		
-		if(connectBool == true && testExist == false)	//Runs commands <------------------------------------------------------------------------
+		if(global_connect == true && testExist == false)	//Runs commands <------------------------------------------------------------------------
 		{	
 			comWorked = temp.run(pointChar, track);
 		}
-		connectBool = true;
+		global_connect = true;
 
 		
 		if(connect.size() > 0 && counter < connect.size()) //goes through here only if there are connectors
@@ -257,11 +307,11 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 				}
 				else if(currRead == "&&")
 				{
-					connectBool = ampersand(comWorked);
+					global_connect = ampersand(comWorked);
 				}
 				else if(currRead == "||")
 				{
-					connectBool = doubleLine(comWorked);
+					global_connect = doubleLine(comWorked);
 				}
 				else if(currRead == "exit")
 				{
@@ -277,11 +327,11 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
                                 }
                                 else if(currRead == "&&")
                                 {
-                                        connectBool = ampersand(testWorked);
+                                        global_connect = ampersand(testWorked);
                                 }
                                 else if(currRead == "||")
                                 {
-                                        connectBool = doubleLine(testWorked);
+                                        global_connect = doubleLine(testWorked);
                                 }
                                 else if(currRead == "exit")
                                 {
@@ -388,7 +438,7 @@ bool Command::test(string test)
 		if(test.at(p) == '/')
 		{
 			path = test.substr(p,test.size() - p);
-			cout << "path: " << path << "!" << endl;
+			//cout << "path: " << path << "!" << endl;
 			break;
 		}
 	}  

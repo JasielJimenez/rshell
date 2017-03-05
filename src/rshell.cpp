@@ -79,7 +79,7 @@ unsigned int g = cLine.size() - 1;
  }
 
 //Isolates parentheses--------------------------------------------------------------------------------------------------------------------------------
- int f = 0;
+ //int f = 0;
  bool isParen = false;
  unsigned int h = newStr.size();
  string newStr2 = newStr;
@@ -91,12 +91,12 @@ unsigned int g = cLine.size() - 1;
 		{
 			isParen = true;
 		}
-		newStr2 = newStr2.substr(0, k + f);
-		newStr2 = newStr2 + " ";					//IF WE ARE KEEPING IN PARENTHESES, DO WE NEED PERCENT SIGN?
-		newStr2 = newStr2 + newStr.substr(k, 1);
-		newStr2 = newStr2 + " ";
-		newStr2 = newStr2 + newStr.substr(k + 1, newStr.size() - k);	//NEED SPACES ON RIGHT SIDE OF PARENTHESES
-		f = f + 2;
+//		newStr2 = newStr2.substr(0, k + f);
+//		newStr2 = newStr2 + " ";					//IF WE ARE KEEPING IN PARENTHESES, DO WE NEED PERCENT SIGN?
+//		newStr2 = newStr2 + newStr.substr(k, 1);
+//		newStr2 = newStr2 + " ";
+//		newStr2 = newStr2 + newStr.substr(k + 1, newStr.size() - k);	//NEED SPACES ON RIGHT SIDE OF PARENTHESES
+//		f = f + 2;
 	}
  }
 
@@ -143,7 +143,7 @@ unsigned int g = cLine.size() - 1;
 			{
 				for(unsigned int q = x; q < newStr2.size(); q++)
 				{
-					if(newStr2.at(q) == '%')
+					if(newStr2.at(q) == '%' || newStr2.at(q) == '(' || newStr2.at(q) == ')')
 					{
 						testStore = newStr2.substr(x + 5, q - x - 6);
 						result = testObject.test(testStore);
@@ -187,6 +187,7 @@ unsigned int g = cLine.size() - 1;
  }
  if(isParen == false)
  {
+	cout << "String=" << newStr2 << endl;
 	object.split(newStr2); //Splits the string into tokens and then runs it -------------------------------------------------------------------------
  }
  else
