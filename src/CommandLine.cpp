@@ -5,7 +5,6 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <stdlib.h>
-//#include <sys/types.h>
 #include <sys/stat.h>
 
 #include "CommandLine.h"
@@ -33,10 +32,8 @@ string trimElements(string original, string elmToTrim)
 void CommandLine::precedence(string comLine)
 {
 	int level = 0;
-	//cout << "comLine: " << comLine.size() << endl;
 	for(unsigned int j = 0; j < comLine.size(); j++)
 	{
-		//cout << "j=" << j << endl;
 		//base case: no beginning parentheses
 		if(comLine.at(j) != '(')
 		{
@@ -46,22 +43,16 @@ void CommandLine::precedence(string comLine)
 				if(comLine.at(l) == '(')
 				{
 					string temp = comLine.substr(j, l - j);
-					//cout << "->" << temp << "!" << endl;
 					split(temp);
 					j = l - 1; //Not + 1 to account for j++
-					//cout << "J = " << j << endl;
-					//cout << "L = " << l << endl;
 					break;
 				} //runs everything inside parentheses
 				else if(l == comLine.size() - 1)
 				{
 					//+ 1 accounts for size of entire string
 					string temp = comLine.substr(j, l - j + 1);
-					//cout << "->" << temp << "!" << endl;
 					split(temp);
 					j = l + 1;
-					//cout << "J = " << j << endl;
-					//cout << "L = " << l << endl;
 					break;
 				}
 			}
@@ -74,50 +65,24 @@ void CommandLine::precedence(string comLine)
 				//search for the second half of the parentheses
 				if(comLine.at(k) == '(')// || comLine.at(k) == ')')
 				{
-					level++; //?
+					level++;
 				}
 				else if(comLine.at(k) == ')')
 				{
 					level--;
 					if(level == 0)
 					{
-						//cout << "k= " << k << endl;
 						string temp = comLine.substr(j + 1, k - j - 1);
-						//cout << "temp:" << temp << "!" << endl;
 						precedence(temp);
 						j = k + 1;
 						break;
-						//split(temp);
 					}
 				}
 			}
 		}
-//		else if(comLine.at(j) != '(')
-//		{
-//			for(unsigned int m = j; m < comLine.size(); m++)
-//			{
-//				if(comLine.at(m) == '(')
-//				{
-//					string temp = comLine.substr(j, m - j);
-//					split(temp);
-//					break;
-//				}
-//				else if(m == comLine.size() - 1)
-//				{
-//					cout << "pupper" << endl;
-//					string temp = comLine.substr(j, m - j + 1);
-//					split(temp);
-//					break;
-//				}
-//			}
-//		}	
 	}
 }
 
-//	if(global_connect == false)
-//	{
-	//	Don't run(before recursion)
-//	}
 
 
 void CommandLine::split(string comLine)
@@ -175,8 +140,6 @@ void CommandLine::split(string comLine)
 			str.erase(p + 1);
 		}	
 
-//		string str(temp);//Converts cstring to string
-//		str = trimElements(str, " \t");
 		
 		// percentage represents end of a command
 		if(str == "%")
@@ -248,7 +211,6 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			testWorked = true;
 			//global_connect = true;
 		}
-		//vecChar.push_back("\0");
 		//Fills char**, y is used to keep track of the vector, z is used to keep track of the char**
 		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)
 		{
@@ -434,7 +396,6 @@ bool Command::test(string test)
 		if(test.at(p) == '/')
 		{
 			path = test.substr(p,test.size() - p);
-			//cout << "path: " << path << "!" << endl;
 			break;
 		}
 	}  
@@ -455,23 +416,20 @@ bool Command::test(string test)
 
 	struct stat s;
 	int i = stat(charTest, &s);
-	if(i == -1)
+	if(i == -1)	//checks to see if path exists
 	{
 		perror("Stat Failure");
-		//cout << "(False)" << endl;
 		return false;
 	}
-
+	//Flag checks
 	if(test_flag == "-d")
 	{
 		if(S_ISDIR(s.st_mode))
 		{
-			//cout << "(True)" << endl;
 			return true;
 		}
 		else
 		{
-			//cout << "(False)" << endl;
 			return false;
 		}
 	}
@@ -479,18 +437,15 @@ bool Command::test(string test)
 	{
 		if(S_ISREG(s.st_mode))
 		{
-			//cout << "(True)" << endl;
 			return true;
 		}
 		else
 		{
-			//cout << "(False)" << endl;
 			return false;
 		}
 	}
 	else
 	{
-		//cout << "(True)" << endl;
 		return true;
 	}
 	return false;
