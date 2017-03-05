@@ -8,5 +8,5 @@ ls && echo hello || mkdir when
 echo hey; echo how || echo where; echo are; echo you
 mkdir newdir && ls && echo done
 echo party?; mkdir party || echo nope || echo yeah
-mkdir firstfile &&  mkdir secondfile && ls
+mkdir firstfile &&  mkdir secondfile && ls -a
 exit
