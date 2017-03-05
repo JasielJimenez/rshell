@@ -248,6 +248,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			testWorked = true;
 			//global_connect = true;
 		}
+		//vecChar.push_back("\0");
 		//Fills char**, y is used to keep track of the vector, z is used to keep track of the char**
 		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)
 		{
@@ -261,7 +262,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 				}
 				else
 				{
-					var = -1;	//ERROR: echo hello && ls	results in a error
+					var = -1;
 				}
 				break;
 			}
@@ -272,15 +273,10 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 				pointChar[z] = ch_temp;
 				if(vecChar.size() == 1)// || y == vecChar.size() - 1)
 				{
-					//cout << "y = " << y << endl; 
-					//cout << vecChar.size() << endl;
-					//cout << vecChar.at(y) << endl;
 					pointChar[y + 1] = '\0';
 				}
 				else if(y == vecChar.size() - 1)
 				{
-					//cout << vecChar.at(y) << endl;
-					//cout << "blah" << endl;
 					pointChar[y + 1] = '\0';
 				}
 			}

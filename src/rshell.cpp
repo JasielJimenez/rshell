@@ -187,7 +187,6 @@ unsigned int g = cLine.size() - 1;
  }
  if(isParen == false)
  {
-	cout << "String=" << newStr2 << endl;
 	object.split(newStr2); //Splits the string into tokens and then runs it -------------------------------------------------------------------------
  }
  else
