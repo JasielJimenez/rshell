@@ -15,7 +15,7 @@ class CommandLine {
  //void setCounter(int num); //sets counter to zero
  //void updateCounter(); //increments counter by one after reading a command
  void split(string comLine); //splits comLine into commands and connectors
- void precedence(string comLine);
+ void precedence(string comLine); //Deals with precedence operator
 };
 
 class Symbol : public CommandLine {

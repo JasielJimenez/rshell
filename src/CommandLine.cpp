@@ -5,7 +5,6 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 
 #include "CommandLine.h"
@@ -15,20 +14,75 @@ using namespace std;
 bool parenWorked = false;
 bool global_connect = true;
 
+
+string trimElements(string original, string elmToTrim)
+{
+	string str = original + "\0";
+	size_t p = str.find_first_not_of(elmToTrim);
+	str.erase(0,p);
+	p = str.find_last_not_of(elmToTrim);
+	if(string::npos != p)
+	{
+		str.erase(p + 1);
+	}	
+
+	return str;
+}
+
 void CommandLine::precedence(string comLine)
 {
+	int level = 0;
 	for(unsigned int j = 0; j < comLine.size(); j++)
 	{
-		if(j == 0)
+		//base case: no beginning parentheses
+		if(comLine.at(j) != '(')
 		{
-
+			for(unsigned int l = j; l < comLine.size(); l++)
+			{
+				//runs everything before parentheses
+				if(comLine.at(l) == '(')
+				{
+					string temp = comLine.substr(j, l - j);
+					split(temp);
+					j = l - 1; //Not + 1 to account for j++
+					break;
+				} //runs everything inside parentheses
+				else if(l == comLine.size() - 1)
+				{
+					//+ 1 accounts for size of entire string
+					string temp = comLine.substr(j, l - j + 1);
+					split(temp);
+					j = l + 1;
+					break;
+				}
+			}
 		}
-		if(comLine.at(j) == '(' && comLine.at(j + 1) != '(')
+		else if(comLine.at(j) == '(')// && comLine.at(j + 1) != '(')
 		{
-
+			level++;
+			for(unsigned int k = j + 1; k < comLine.size(); k++)
+			{
+				//search for the second half of the parentheses
+				if(comLine.at(k) == '(')// || comLine.at(k) == ')')
+				{
+					level++;
+				}
+				else if(comLine.at(k) == ')')
+				{
+					level--;
+					if(level == 0)
+					{
+						string temp = comLine.substr(j + 1, k - j - 1);
+						precedence(temp);
+						j = k + 1;
+						break;
+					}
+				}
+			}
 		}
 	}
 }
+
 
 
 void CommandLine::split(string comLine)
@@ -36,7 +90,8 @@ void CommandLine::split(string comLine)
 	connect = vector<string>();
 	this->comLine = comLine;
 	Symbol obj;
-	for(unsigned int i = 0; i < comLine.size(); i++) //puts connectors into vector
+ 	//puts connectors into vector
+	for(unsigned int i = 0; i < comLine.size(); i++)
 	{
 		if(comLine.at(i) == ';')
 		{
@@ -64,39 +119,40 @@ void CommandLine::split(string comLine)
 
 	
 
+	//converts string into cstring
 	char* cstring = new char [comLine.size() + 1];
-	strcpy(cstring, comLine.c_str()); 		//converts string into cstring
+	strcpy(cstring, comLine.c_str());
 
+	// create vector to store tokens
         vector<string> vecChar;
 	char* pointer = strtok(cstring," ;||&&");
 	char* temp = pointer;
 	while(temp != NULL)
 	{
-		string str(temp);		//Converts cstring to string
+	 	//removes leading whitespace
+		string str(temp);//Converts cstring to string
 		str = str + "\0";
-		size_t p = str.find_first_not_of(" \t");	 //removes leading whitespace
+		size_t p = str.find_first_not_of(" \t");
 		str.erase(0,p);
 		p = str.find_last_not_of(" \t");
 		if(string::npos != p)
 		{
 			str.erase(p + 1);
 		}	
+
 		
-	
+		// percentage represents end of a command
 		if(str == "%")
-		 {	
-		 	vecChar.push_back("\0");
-		 }
-		 else
-		 {
+		{	
+			vecChar.push_back("\0");
+		}
+		else
+		{
 			vecChar.push_back( str   );
-		 }
+		}
 		temp = strtok(NULL," ;||&&");
 	}
 		
-	
-
-
 	
 	obj.Reader(vecChar,connect); //calls the reader function
 	
@@ -109,28 +165,35 @@ void CommandLine::split(string comLine)
 	
 }
 
+// vecChar = vector of strings representing tokenized strings
+// connect = vector of strings, lists all connectors of current substring
 void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 {
 	
-	bool comWorked = false;
+	bool comWorked = false; // did the command run successfully?
 
-	bool testExist = false;		//Used to skip executing the replaced test command
+	bool testExist = false;	//Used to skip executing the replaced test command
 	bool testWorked = false;
 
 	Command temp;
 	
 
-	unsigned int counter = 0;
+	unsigned int counter = 0; // goes through connector list in while loop
 	int track = 0;
 	int trackCount = 0;
 	int pCharSize = vecChar.size() + 1;
 	int adjSize = pCharSize;
 	int var = 0;
-	bool connectBool = true;
+	//bool connectBool = true;
 	char** pointChar = new char*[pCharSize];
 
 	while(counter < connect.size() + 1)
 	{
+		if(var == -1)
+		{
+			break;
+		}
+
 		if(vecChar.at(var) == "exit")
 		{
 			exit(0);
@@ -139,15 +202,19 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		{
 			cout << "(False)" << endl;
 			testExist = true;
+			//global_connect = false;
 		}
 		else if(vecChar.at(var) == "TRUE")
 		{
 			cout << "(True)" << endl;
 			testExist = true;
 			testWorked = true;
+			//global_connect = true;
 		}
-		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)	//Fills char**, y is used to keep track of the vector, z is used to keep track of the char**
+		//Fills char**, y is used to keep track of the vector, z is used to keep track of the char**
+		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)
 		{
+			// reached end of command
 			if(vecChar[y] == "\0")
 			{
 				pointChar[y] = '\0';
@@ -155,21 +222,33 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 				{
 					var = y + 1;
 				}
+				else
+				{
+					var = -1;
+				}
 				break;
 			}
-			else
+			else //copies over current vector element
 			{
 				string st_temp = vecChar[y];
 				char* ch_temp = (char *)st_temp.c_str();
 				pointChar[z] = ch_temp;
+				if(vecChar.size() == 1)// || y == vecChar.size() - 1)
+				{
+					pointChar[y + 1] = '\0';
+				}
+				else if(y == vecChar.size() - 1)
+				{
+					pointChar[y + 1] = '\0';
+				}
 			}
 		}		
 		
-		if(connectBool == true && testExist == false)	//DON'T KNOW IF THIS WORKS YET <-------------------------------------------------------------------------
-		{
+		if(global_connect == true && testExist == false)	//Runs commands <------------------------------------------------------------------------
+		{	
 			comWorked = temp.run(pointChar, track);
 		}
-		connectBool = true;
+		global_connect = true;
 
 		
 		if(connect.size() > 0 && counter < connect.size()) //goes through here only if there are connectors
@@ -177,7 +256,8 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			
 			string currRead = connect.at(counter);
 			
-			if(testExist == false)		//perform normally if test wasn't done
+			//perform normally if test wasn't done
+			if(testExist == false)
 			{
 				if(currRead == ";")
 				{
@@ -185,18 +265,19 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 				}
 				else if(currRead == "&&")
 				{
-					connectBool = ampersand(comWorked);
+					global_connect = ampersand(comWorked);
 				}
 				else if(currRead == "||")
 				{
-					connectBool = doubleLine(comWorked);
+					global_connect = doubleLine(comWorked);
 				}
 				else if(currRead == "exit")
 				{
 					exit(0);
 				}
 			}
-			else				//use results of test to determine effects of connectors
+			//use results of test to determine effects of connectors
+			else
 			{
 				if(currRead == ";")
                                 {
@@ -204,19 +285,19 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
                                 }
                                 else if(currRead == "&&")
                                 {
-                                        connectBool = ampersand(testWorked);
+                                        global_connect = ampersand(testWorked);
                                 }
                                 else if(currRead == "||")
                                 {
-                                        connectBool = doubleLine(testWorked);
+                                        global_connect = doubleLine(testWorked);
                                 }
                                 else if(currRead == "exit")
                                 {
                                         exit(0);
-                                }
-	
+                                }	
 			}
 		}
+
 		counter++;
 		trackCount = track;
 		while(trackCount < pCharSize && pointChar[trackCount] != '\0')
@@ -227,9 +308,9 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		adjSize--;
 		track = trackCount + 1;
 	
-	testWorked = false;
-	testExist = false;
-	}
+		testWorked = false;
+		testExist = false;
+	} // end of while-loop
 }
 
 void Symbol::semicolon()
@@ -315,7 +396,6 @@ bool Command::test(string test)
 		if(test.at(p) == '/')
 		{
 			path = test.substr(p,test.size() - p);
-			cout << "path: " << path << "!" << endl;
 			break;
 		}
 	}  
@@ -336,23 +416,20 @@ bool Command::test(string test)
 
 	struct stat s;
 	int i = stat(charTest, &s);
-	if(i == -1)
+	if(i == -1)	//checks to see if path exists
 	{
 		perror("Stat Failure");
-		//cout << "(False)" << endl;
 		return false;
 	}
-
+	//Flag checks
 	if(test_flag == "-d")
 	{
 		if(S_ISDIR(s.st_mode))
 		{
-			//cout << "(True)" << endl;
 			return true;
 		}
 		else
 		{
-			//cout << "(False)" << endl;
 			return false;
 		}
 	}
@@ -360,18 +437,15 @@ bool Command::test(string test)
 	{
 		if(S_ISREG(s.st_mode))
 		{
-			//cout << "(True)" << endl;
 			return true;
 		}
 		else
 		{
-			//cout << "(False)" << endl;
 			return false;
 		}
 	}
 	else
 	{
-		//cout << "(True)" << endl;
 		return true;
 	}
 	return false;
