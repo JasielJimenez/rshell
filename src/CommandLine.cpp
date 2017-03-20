@@ -188,6 +188,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 	int var = 0;
 	//bool connectBool = true;
 	char** pointChar = new char*[pCharSize];
+	
 	bool currRedirect = false;
 	int comRed = 0;
 	vector<bool> commandRedirect;
@@ -218,36 +219,25 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			testWorked = true;
 			//global_connect = true;
 		}
-		
-	//	for(unsigned int a = 0; a < vecChar.size(); a++)	//seaches for existance of redirect
-	//	{
-	//		for(unsigned int b = findRedirect; vecChar.at(b) != '\0'; b++)
-	//		{
-	//			if(vecChar.at(b) == "<" || vecChar.at(b) == ">" || vecChar.at(b) == ">>" || vecChar.at(b) == "|")
-	//			{
-	//				commandRedirect.push_back(1)
-	//			}			
-	//		}
-	//		a = b;
-	//		findRedirect = a + 1;	//skips over null character
-	//	}
-
-		//Fills char**, y is used to keep track of the vector, z is used to keep track of the char**
-		
+			
 		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)
 		{
-			for(unsigned int a = var; vecChar[a] != "\0"; a++)
+			for(unsigned int a = var; a != vecChar.size() && vecChar[a] != "\0"; a++)
 			{
+				cout << "vecChar.size(): " << vecChar.size() << endl;
+				cout << "vecChar[a]: " << vecChar[a] << endl;
+				cout << "a: " << a << endl;
 				if(vecChar[a] == "<" || vecChar[a] == ">" || vecChar[a] == ">>" || vecChar[a] == "|")
 				{
+					cout << "NO" << endl;
 					currRedirect = true;
 					commandRedirect.push_back(currRedirect);
 					break;					//Make sure it only breaks outs of inner for loop
 				}
 			}
-			if(currRedirect = false)
+			if(currRedirect == false)
 			{
-				
+				cout << "DDOS" << endl;
 				// reached end of command
 				if(vecChar[y] == "\0")
 				{
@@ -271,16 +261,22 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 					pointChar[z] = ch_temp;
 					if(vecChar.size() == 1)// || y == vecChar.size() - 1)
 					{
+						commandRedirect.push_back(false);
 						pointChar[y + 1] = '\0';
+						//var = y + 1;
 					}
 					else if(y == vecChar.size() - 1)
 					{
+						commandRedirect.push_back(false);
 						pointChar[y + 1] = '\0';
+						//var = y + 1;
 					}
+					//var = y + 1;
 				}
 			}
 			else
 			{
+				cout << "SCOTLAND" << endl;	//SEGFAULTS AFTER THIS POINT
 				int jTrack = 0;
 				for(unsigned int j = var; vecChar[j] != "\0"; j++)
 				{
@@ -291,19 +287,22 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 				{
 					storeCom.push_back(vecChar[k]);
 				}
-				var = y + 1;
+				//var = y + 1;
 				break;
 			}
 
 			currRedirect = false;
 		}		
-		
+		cout << "commandRedirect size: " << commandRedirect.size() << endl;
+		cout << "comRed: " << comRed << endl;
 		if(global_connect == true && testExist == false && commandRedirect[comRed] == false)	//Runs commands <------------------------------------------------------------------------
 		{	
+			cout << "DA WHEEL" << endl;
 			comWorked = temp.run(pointChar, track);
 		}
 		else if(global_connect == true && testExist == false && commandRedirect[comRed] == true)
 		{
+			cout<< "DAT BOI" << endl;
 			comWorked = temp.run_redirect(storeCom);
 		}
 		global_connect = true;
@@ -454,6 +453,10 @@ bool Command::run_redirect(vector<string> storeCom)
 	bool output_closed = false;
 	pid_t pid;
 
+	int pCharSize = storeCom.size() + 1; 
+	char** pointChar = new char*[pCharSize];
+	int wait = 0;
+
 	for(unsigned int q = 0; q < storeCom.size(); q++)
 	{
 		if(storeCom[q] == "<")
@@ -518,6 +521,65 @@ bool Command::run_redirect(vector<string> storeCom)
 		output = open(allComs.back().front().c_str(), O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR );
 		allComs.pop_back();
 		output_closed = true;
+	}
+	
+	for(unsigned int z = 0; z < allComs.size(); z++)
+	{
+		pipe(redirect);
+		pid = fork();
+		if(pid == 0)
+		{
+			dup2(redirect_input,0);
+			if(z < allComs.size() - 1)
+			{
+				dup2(redirect[1],0);
+			}
+			else
+			{
+				dup2(output,0);
+			}
+			close(redirect[0]);
+
+			for(unsigned int g = 0; g < allComs[z].size(); g++)
+			{
+				string st_temp = allComs[z][g];
+                		char* ch_temp = (char *)st_temp.c_str();
+                		pointChar[g] = ch_temp;
+               			if(allComs[z].size() == 1)// || y == vecChar.size() - 1)
+                		{
+                			pointChar[g + 1] = '\0';
+                		}
+                		else if(g == allComs[z].size() - 1)
+                		{
+               	 			pointChar[g + 1] = '\0';
+		      		}
+			}
+			wait = execvp(pointChar[0], pointChar);
+		
+		}
+		else if(pid < 0)
+        	{
+        	        perror("fork error");
+	                return false;
+	        }
+		else
+		{
+			if(waitpid(pid, &wait, 0) != pid)
+			{
+				perror("wait error");
+				
+			}
+			close(redirect[1]);
+			redirect_input = redirect[0];			
+		}
+	}
+	if(input_closed == true)
+	{
+		close(input);
+	}
+	if(output_closed == true)
+	{
+		close(output);
 	}
 
 	return true;
