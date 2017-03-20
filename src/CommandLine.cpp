@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 #include "CommandLine.h"
 
@@ -406,30 +407,6 @@ bool Command::run(char** pointChar, int track) //run commands correctly
 	int array[2];	
 	pid_t pid;	
 	int temp;
-
-	//for(unsigned int q = 0; pointChar[q] != NULL; q++)
-	//{
-	//	for(unsigned int p = 0; pointChar[p] != '\0'; p++)
-	//	{
-	//		if(pointChar[q][p] == '<')
-	//		{
-	//
-	//		}
-	//		else if(pointChar[q][p] == '>' && pointChar[q][p+1] != '>')
-	//		{
-	//		
-	//		}
-	//		else if(pointChar[q][p] == '>' && pointChar[q][p+1] == '>')
-	//		{
-	//
-	//		}
-	//		else if(pointChar[q][p] == '|' && pointChar[q][p + 1] != '|')
-	//		{
-	//				
-	//		}
-	//	}
-	//}
-
 	
 	pid = fork();
 	
@@ -460,7 +437,89 @@ bool Command::run(char** pointChar, int track) //run commands correctly
 //Handles redirection
 bool Command::run_redirect(vector<string> storeCom)
 {
-	
+	//Checks for each symbol used in redirection
+	bool isInput = false;
+	bool isOutput = false;
+	bool isOutput2 = false;
+	bool isPipe = false;
+	vector< vector<string> > allComs;	//2D vector that stores each part of the entire command, but keeps them separated
+	vector<string> comPart; 	//part that will contain up to redirection symbols
+
+	//variables required for opening files for input and output
+	int redirect[2];
+	int input = 0;
+	int output = 1;
+	int redirect_input;
+	bool input_closed = false;
+	bool output_closed = false;
+	pid_t pid;
+
+	for(unsigned int q = 0; q < storeCom.size(); q++)
+	{
+		if(storeCom[q] == "<")
+		{
+			allComs.push_back(comPart);	//adds everything up to symbol
+			isInput = true;			//Found symbol needed for later part
+			while(comPart.empty() == false)	//Clears out vector for next loop
+			{
+				comPart.pop_back();
+			}
+		}
+		else if(storeCom[q] == ">")
+		{
+			allComs.push_back(comPart);
+			isOutput = true;
+			while(comPart.empty() == false)
+			{
+				comPart.pop_back();
+			}
+		}
+		else if(storeCom[q] == ">>")
+		{
+			allComs.push_back(comPart);
+			isOutput2 = true;
+			while(comPart.empty() == false)
+                        {
+                                comPart.pop_back();
+                        }
+		}
+		else if(storeCom[q] == "|")
+		{
+			allComs.push_back(comPart);
+			isPipe = true;
+			while(comPart.empty() == false)
+                        {
+                                comPart.pop_back();
+                        }
+		}
+		else
+		{
+			comPart.push_back(storeCom.at(q));	//continues adding to vector until symbol is found
+		}
+	}
+	allComs.push_back(comPart);	//adds remaining part of original command
+
+	if(isInput == true)
+	{
+		input = open(allComs[1].front().c_str(), O_RDONLY);
+		redirect_input = input;
+		allComs.erase(allComs.begin() + 1);
+		input_closed = true;		
+	}
+
+	if(isOutput == true)
+	{
+		output = open(allComs.back().front().c_str(), O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR );
+		allComs.pop_back();
+		output_closed = true;
+	}
+	else if(isOutput2 == true)
+	{
+		output = open(allComs.back().front().c_str(), O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR );
+		allComs.pop_back();
+		output_closed = true;
+	}
+
 	return true;
 }
 
