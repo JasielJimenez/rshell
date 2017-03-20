@@ -218,18 +218,18 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			testExist = true;
 			testWorked = true;
 			//global_connect = true;
-		}
-			
+		}		
 		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)
 		{
+			currRedirect = false;
+			cout << "vecChar[y]: " << vecChar[y] << endl;
 			for(unsigned int a = var; a != vecChar.size() && vecChar[a] != "\0"; a++)
 			{
-				cout << "vecChar.size(): " << vecChar.size() << endl;
-				cout << "vecChar[a]: " << vecChar[a] << endl;
-				cout << "a: " << a << endl;
+				//cout << "vecChar.size(): " << vecChar.size() << endl;
+				//cout << "vecChar[a]: " << vecChar[a] << endl;
+				//cout << "a: " << a << endl;
 				if(vecChar[a] == "<" || vecChar[a] == ">" || vecChar[a] == ">>" || vecChar[a] == "|")
 				{
-					cout << "NO" << endl;
 					currRedirect = true;
 					commandRedirect.push_back(currRedirect);
 					break;					//Make sure it only breaks outs of inner for loop
@@ -237,7 +237,6 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			}
 			if(currRedirect == false)
 			{
-				cout << "DDOS" << endl;
 				// reached end of command
 				if(vecChar[y] == "\0")
 				{
@@ -255,7 +254,8 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 					break;
 				}
 				else //copies over current vector element
-				{
+				{	
+					//cout << vecChar[y];
 					string st_temp = vecChar[y];
 					char* ch_temp = (char *)st_temp.c_str();
 					pointChar[z] = ch_temp;
@@ -275,9 +275,8 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 				}
 			}
 			else
-			{
-				cout << "SCOTLAND" << endl;	//SEGFAULTS AFTER THIS POINT
-				int jTrack = 0;
+			{	
+				unsigned int jTrack = 0;
 				for(unsigned int j = var;j != vecChar.size() && vecChar[j] != "\0"; j++)
 				{
 					jTrack = j;
@@ -287,28 +286,27 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 				{
 					storeCom.push_back(vecChar[k]);
 				}
-				//var = y + 1;
+				var = jTrack + 1;
 				break;
 			}
 
 			currRedirect = false;
 		}		
-		cout << "commandRedirect size: " << commandRedirect.size() << endl;
-		cout << "comRed: " << comRed << endl;
+		//cout << "commandRedirect size: " << commandRedirect.size() << endl;
+		//cout << "comRed: " << comRed << endl;
 		if(global_connect == true && testExist == false && commandRedirect[comRed] == false)	//Runs commands <------------------------------------------------------------------------
-		{	
-			cout << "DA WHEEL" << endl;
+		{
+			cout << "-> normal" << endl;
 			comWorked = temp.run(pointChar, track);
 		}
-		else if(global_connect == true && testExist == false && commandRedirect[comRed] == true)
+		else if(global_connect == true && testExist == false && commandRedirect[comRed] == true)//Runs commands with redirection <------------------------------------------------------- 
 		{
-			cout<< "DAT BOI" << endl;
+			cout << "-> redirect" << endl;
 			comWorked = temp.run_redirect(storeCom);
 		}
 		global_connect = true;
 		//redirectExist = false;
 		comRed++;		
-
 
 		if(connect.size() > 0 && counter < connect.size()) //goes through here only if there are connectors
 		{
@@ -402,8 +400,7 @@ bool Symbol::doubleLine(bool comWorked) //implement next command only if last co
 }
 
 bool Command::run(char** pointChar, int track) //run commands correctly
-{	
-	int array[2];	
+{		
 	pid_t pid;	
 	int temp;
 	
@@ -414,7 +411,8 @@ bool Command::run(char** pointChar, int track) //run commands correctly
 		if(execvp(pointChar[0],pointChar) == -1)
 		{
 			perror("execvp error");
-			return false;
+			//return false;
+			exit(0);
 		}
 	}
 	else if(pid < 0)
@@ -442,7 +440,7 @@ bool Command::run_redirect(vector<string> storeCom)
 	bool isOutput2 = false;
 	bool isPipe = false;
 	vector< vector<string> > allComs;	//2D vector that stores each part of the entire command, but keeps them separated
-	vector<string> comPart; 	//part that will contain up to redirection symbols
+	vector<string> comPart; 		//part that will contain up to redirection symbols
 
 	//variables required for opening files for input and output
 	int redirect[2];
@@ -453,17 +451,16 @@ bool Command::run_redirect(vector<string> storeCom)
 	bool output_close = false;
 	pid_t pid;
 
+	//Variables used for execvp()
 	int pCharSize = storeCom.size() + 1; 
 	char** pointChar = new char*[pCharSize];
 	int wait = 0;
 
-	cout << "In function" << endl;
 
 	for(unsigned int q = 0; q < storeCom.size(); q++)
 	{
 		if(storeCom[q] == "<")
 		{
-			cout << "< part" << endl;
 			allComs.push_back(comPart);	//adds everything up to symbol
 			isInput = true;			//Found symbol needed for later part
 			while(comPart.empty() == false)	//Clears out vector for next loop
@@ -504,12 +501,10 @@ bool Command::run_redirect(vector<string> storeCom)
 		}
 	}
 	allComs.push_back(comPart);	//adds remaining part of original command
-
-	cout << "allComs.size(): " << allComs.size() << endl;	
+	
 
 	if(isInput == true)
 	{
-		cout << "isInput is true" << endl;
 		input = open(allComs[1].front().c_str(), O_RDONLY);
 		redirect_input = input;
 		allComs.erase(allComs.begin() + 1);
@@ -529,17 +524,16 @@ bool Command::run_redirect(vector<string> storeCom)
 		output_close = true;
 	}
 	
-	cout << endl;
-	for(unsigned int i = 0; i < allComs.size(); i++)
-	{
-		for(unsigned int j = 0; j < allComs[i].size(); j++)
-		{
-			cout << allComs[i][j] << " ";
-		}
-		cout << endl;
-	}
-
-	cout << endl;
+//	cout << endl;
+//	for(unsigned int i = 0; i < allComs.size(); i++)
+//	{
+//		for(unsigned int j = 0; j < allComs[i].size(); j++)
+//		{
+//			cout << allComs[i][j] << " ";
+//		}
+//		cout << endl;
+//	}
+//	cout << endl;
 
 	for(unsigned int z = 0; z < allComs.size(); z++)
 	{
@@ -554,10 +548,8 @@ bool Command::run_redirect(vector<string> storeCom)
 			}
 			else
 			{
-				cout << "out if" << endl;
 				dup2(output,1);
 			}
-			cout << "close" << endl;
 			close(redirect[0]);
 
 			for(unsigned int g = 0; g < allComs[z].size(); g++)
