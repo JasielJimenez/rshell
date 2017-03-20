@@ -278,7 +278,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			{
 				cout << "SCOTLAND" << endl;	//SEGFAULTS AFTER THIS POINT
 				int jTrack = 0;
-				for(unsigned int j = var; vecChar[j] != "\0"; j++)
+				for(unsigned int j = var;j != vecChar.size() && vecChar[j] != "\0"; j++)
 				{
 					jTrack = j;
 				}
@@ -449,18 +449,21 @@ bool Command::run_redirect(vector<string> storeCom)
 	int input = 0;
 	int output = 1;
 	int redirect_input;
-	bool input_closed = false;
-	bool output_closed = false;
+	bool input_close = false;
+	bool output_close = false;
 	pid_t pid;
 
 	int pCharSize = storeCom.size() + 1; 
 	char** pointChar = new char*[pCharSize];
 	int wait = 0;
 
+	cout << "In function" << endl;
+
 	for(unsigned int q = 0; q < storeCom.size(); q++)
 	{
 		if(storeCom[q] == "<")
 		{
+			cout << "< part" << endl;
 			allComs.push_back(comPart);	//adds everything up to symbol
 			isInput = true;			//Found symbol needed for later part
 			while(comPart.empty() == false)	//Clears out vector for next loop
@@ -502,42 +505,59 @@ bool Command::run_redirect(vector<string> storeCom)
 	}
 	allComs.push_back(comPart);	//adds remaining part of original command
 
+	cout << "allComs.size(): " << allComs.size() << endl;	
+
 	if(isInput == true)
 	{
+		cout << "isInput is true" << endl;
 		input = open(allComs[1].front().c_str(), O_RDONLY);
 		redirect_input = input;
 		allComs.erase(allComs.begin() + 1);
-		input_closed = true;		
+		input_close = true;		
 	}
 
 	if(isOutput == true)
 	{
 		output = open(allComs.back().front().c_str(), O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR );
 		allComs.pop_back();
-		output_closed = true;
+		output_close = true;
 	}
 	else if(isOutput2 == true)
 	{
 		output = open(allComs.back().front().c_str(), O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR );
 		allComs.pop_back();
-		output_closed = true;
+		output_close = true;
 	}
 	
+	cout << endl;
+	for(unsigned int i = 0; i < allComs.size(); i++)
+	{
+		for(unsigned int j = 0; j < allComs[i].size(); j++)
+		{
+			cout << allComs[i][j] << " ";
+		}
+		cout << endl;
+	}
+
+	cout << endl;
+
 	for(unsigned int z = 0; z < allComs.size(); z++)
 	{
-		pipe(redirect);
+		pipe(redirect);			//Starts piping
 		pid = fork();
 		if(pid == 0)
 		{
 			dup2(redirect_input,0);
-			if(z < allComs.size() - 1)
+			if(z < allComs.size() - 1)			//ERROR COULD BE HERE --------------------------------------------------------------------
 			{
-				dup2(redirect[1],0);
+				dup2(redirect[1],1);
 			}
 			else
 			{
-				dup2(output,0);
+				cout << "out if" << endl;
+				dup2(output,1);
 			}
+			cout << "close" << endl;
 			close(redirect[0]);
 
 			for(unsigned int g = 0; g < allComs[z].size(); g++)
@@ -555,7 +575,8 @@ bool Command::run_redirect(vector<string> storeCom)
 		      		}
 			}
 			wait = execvp(pointChar[0], pointChar);
-		
+			perror("execvp error");
+			return false;	
 		}
 		else if(pid < 0)
         	{
@@ -573,15 +594,14 @@ bool Command::run_redirect(vector<string> storeCom)
 			redirect_input = redirect[0];			
 		}
 	}
-	if(input_closed == true)
+	if(input_close == true)
 	{
 		close(input);
 	}
-	if(output_closed == true)
+	if(output_close == true)
 	{
 		close(output);
 	}
-
 	return true;
 }
 
