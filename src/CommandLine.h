@@ -29,7 +29,7 @@ class Symbol : public CommandLine {
 class Command : public CommandLine {
  public:
  bool run(char** pointChar, int track); //runs commands
- bool run_redirect(char** pointChar);
+ bool run_redirect(vector<string> storeCom);
  bool test(string test);
  //bool precedence(string line);
 };

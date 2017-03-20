@@ -191,6 +191,8 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 	int comRed = 0;
 	vector<bool> commandRedirect;
 
+	vector<string> storeCom;
+
 	while(counter < connect.size() + 1)
 	{
 		if(var == -1)
@@ -278,7 +280,18 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			}
 			else
 			{
-				//Sets up for run_redirect function
+				int jTrack = 0;
+				for(unsigned int j = var; vecChar[j] != "\0"; j++)
+				{
+					jTrack = j;
+				}
+				jTrack++;
+				for(unsigned int k = var; k < jTrack; k++)
+				{
+					storeCom.push_back(vecChar[k]);
+				}
+				var = y + 1;
+				break;
 			}
 
 			currRedirect = false;
@@ -290,7 +303,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		}
 		else if(global_connect == true && testExist == false && commandRedirect[comRed] == true)
 		{
-			comWorked = temp.run_redirect(pointChar);
+			comWorked = temp.run_redirect(storeCom);
 		}
 		global_connect = true;
 		//redirectExist = false;
@@ -445,8 +458,9 @@ bool Command::run(char** pointChar, int track) //run commands correctly
 }
 
 //Handles redirection
-bool Command::run_redirect(char** pointChar)
+bool Command::run_redirect(vector<string> storeCom)
 {
+	
 	return true;
 }
 
