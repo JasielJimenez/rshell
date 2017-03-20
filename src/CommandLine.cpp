@@ -13,6 +13,7 @@ using namespace std;
 
 bool parenWorked = false;
 bool global_connect = true;
+//bool redirectExist = false; 
 
 
 string trimElements(string original, string elmToTrim)
@@ -186,6 +187,9 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 	int var = 0;
 	//bool connectBool = true;
 	char** pointChar = new char*[pCharSize];
+	bool currRedirect = false;
+	int comRed = 0;
+	vector<bool> commandRedirect;
 
 	while(counter < connect.size() + 1)
 	{
@@ -211,46 +215,88 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 			testWorked = true;
 			//global_connect = true;
 		}
+		
+	//	for(unsigned int a = 0; a < vecChar.size(); a++)	//seaches for existance of redirect
+	//	{
+	//		for(unsigned int b = findRedirect; vecChar.at(b) != '\0'; b++)
+	//		{
+	//			if(vecChar.at(b) == "<" || vecChar.at(b) == ">" || vecChar.at(b) == ">>" || vecChar.at(b) == "|")
+	//			{
+	//				commandRedirect.push_back(1)
+	//			}			
+	//		}
+	//		a = b;
+	//		findRedirect = a + 1;	//skips over null character
+	//	}
+
 		//Fills char**, y is used to keep track of the vector, z is used to keep track of the char**
+		
 		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)
 		{
-			// reached end of command
-			if(vecChar[y] == "\0")
+			for(unsigned int a = var; vecChar[a] != "\0"; a++)
 			{
-				pointChar[y] = '\0';
-				if(y < vecChar.size() - 1)
+				if(vecChar[a] == "<" || vecChar[a] == ">" || vecChar[a] == ">>" || vecChar[a] == "|")
 				{
-					var = y + 1;
-				}
-				else
-				{
-					var = -1;
-				}
-				break;
-			}
-			else //copies over current vector element
-			{
-				string st_temp = vecChar[y];
-				char* ch_temp = (char *)st_temp.c_str();
-				pointChar[z] = ch_temp;
-				if(vecChar.size() == 1)// || y == vecChar.size() - 1)
-				{
-					pointChar[y + 1] = '\0';
-				}
-				else if(y == vecChar.size() - 1)
-				{
-					pointChar[y + 1] = '\0';
+					currRedirect = true;
+					commandRedirect.push_back(currRedirect);
+					break;					//Make sure it only breaks outs of inner for loop
 				}
 			}
+			if(currRedirect = false)
+			{
+				
+				// reached end of command
+				if(vecChar[y] == "\0")
+				{
+					commandRedirect.push_back(false);
+
+					pointChar[y] = '\0';
+					if(y < vecChar.size() - 1)
+					{
+						var = y + 1;
+					}
+					else
+					{
+						var = -1;
+					}
+					break;
+				}
+				else //copies over current vector element
+				{
+					string st_temp = vecChar[y];
+					char* ch_temp = (char *)st_temp.c_str();
+					pointChar[z] = ch_temp;
+					if(vecChar.size() == 1)// || y == vecChar.size() - 1)
+					{
+						pointChar[y + 1] = '\0';
+					}
+					else if(y == vecChar.size() - 1)
+					{
+						pointChar[y + 1] = '\0';
+					}
+				}
+			}
+			else
+			{
+				//Sets up for run_redirect function
+			}
+
+			currRedirect = false;
 		}		
 		
-		if(global_connect == true && testExist == false)	//Runs commands <------------------------------------------------------------------------
+		if(global_connect == true && testExist == false && commandRedirect[comRed] == false)	//Runs commands <------------------------------------------------------------------------
 		{	
 			comWorked = temp.run(pointChar, track);
 		}
+		else if(global_connect == true && testExist == false && commandRedirect[comRed] == true)
+		{
+			comWorked = temp.run_redirect(pointChar);
+		}
 		global_connect = true;
+		//redirectExist = false;
+		comRed++;		
 
-		
+
 		if(connect.size() > 0 && counter < connect.size()) //goes through here only if there are connectors
 		{
 			
@@ -343,9 +389,35 @@ bool Symbol::doubleLine(bool comWorked) //implement next command only if last co
 }
 
 bool Command::run(char** pointChar, int track) //run commands correctly
-{		
+{	
+	int array[2];	
 	pid_t pid;	
-	int temp;	
+	int temp;
+
+	//for(unsigned int q = 0; pointChar[q] != NULL; q++)
+	//{
+	//	for(unsigned int p = 0; pointChar[p] != '\0'; p++)
+	//	{
+	//		if(pointChar[q][p] == '<')
+	//		{
+	//
+	//		}
+	//		else if(pointChar[q][p] == '>' && pointChar[q][p+1] != '>')
+	//		{
+	//		
+	//		}
+	//		else if(pointChar[q][p] == '>' && pointChar[q][p+1] == '>')
+	//		{
+	//
+	//		}
+	//		else if(pointChar[q][p] == '|' && pointChar[q][p + 1] != '|')
+	//		{
+	//				
+	//		}
+	//	}
+	//}
+
+	
 	pid = fork();
 	
 	if(pid == 0)
@@ -369,6 +441,12 @@ bool Command::run(char** pointChar, int track) //run commands correctly
 			exit(0);
 		}
 	}
+	return true;
+}
+
+//Handles redirection
+bool Command::run_redirect(char** pointChar)
+{
 	return true;
 }
 
