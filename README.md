@@ -36,6 +36,8 @@ hw2
 
 hw3
 
+hw4
+
 …
 /src
 
@@ -46,6 +48,8 @@ CommandLine.h
 hw2
 
 hw3
+
+hw4
 
 rshell.cpp
 
@@ -76,13 +80,17 @@ test_test.sh
 
 test_test_test
 
+redirect_test.sh
+
+redirect_test_test
+
 Follow these directions to use this program:
 ---
 First, enter this line: git clone https://github.com/JasielJimenez/rshell.git
 
 Then: cd rshell
 
-Then: git checkout hw3
+Then: git checkout hw4
 
 Then: make
 
@@ -107,6 +115,14 @@ The “test” command can be run with the flags -e, -f, and -d. The -e command 
 
 Using parentheses () around a command or series of commands will change the precedence of the commands.
 
+The “<” redirector takes the output of a command or the contents of a file and makes them into the input used in another file.
+
+The “>” redirector takes the output of a command or the contents of a file and inserts it into another file, overriding what is in the file.
+
+The “>>” redirector takes the output of a command or the contents of a file and inserts it into another file, adding it on to what is in the file.
+
+The “|” symbol allows you to preform piping.
+
 Typing exit will allow the user to quit the program.
 
 The program displays the user’s username and the hostname of the machine the user is logged in from.
@@ -115,6 +131,12 @@ Bugs
 ---
 
 None of the user’s commands can include a % sign. Our code changes all % signs into null characters, thus if the user enters one, the program will crash.
+
+None of the user’s commands can include an @ sign. Our code changes all | signs (pipe symbol) into @ signs. Then all @ signs are removed, so input using @ will either come out incorrect or crash.
+
+If you have two commands following a redirection and the redirection is the first command, then execvp will run the wrong address for those two commands.
+Ex: cat < testFile && echo hello && echo hi
+(echo hello and echo hi will fail)
 
 If the only input from the user is “exit,” then the program may not exit. May sometimes require multiple exits.
 
