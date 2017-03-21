@@ -227,14 +227,14 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 				//cout << "vecChar.size(): " << vecChar.size() << endl;
 				//cout << "vecChar[a]: " << vecChar[a] << endl;
 				//cout << "a: " << a << endl;
-				if(vecChar[a] == "<" || vecChar[a] == ">" || vecChar[a] == ">>" || vecChar[a] == "|")
+				if(vecChar[a] == "<" || vecChar[a] == ">" || vecChar[a] == ">>" || vecChar[a] == "@")	//checks for existance of redirection symbols
 				{
 					currRedirect = true;
 					commandRedirect.push_back(currRedirect);
 					break;					//Make sure it only breaks outs of inner for loop
 				}
 			}
-			if(currRedirect == false)
+			if(currRedirect == false)	//if no redirection is involved, enter here
 			{
 				// reached end of command
 				if(vecChar[y] == "\0")
@@ -272,7 +272,7 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 					//var = y + 1;
 				}
 			}
-			else
+			else	//If redirection is involved, go through here
 			{	
 				unsigned int jTrack = 0;
 				for(unsigned int j = var;j != vecChar.size() && vecChar[j] != "\0"; j++)
@@ -506,7 +506,7 @@ bool Command::run_redirect(vector<string> storeCom)
 	allComs.push_back(comPart);	//adds remaining part of original command
 	
 
-	if(isInput == true)
+	if(isInput == true)	//if input redirection exists
 	{
 		input = open(allComs[1].front().c_str(), O_RDONLY);
 		redirect_input = input;
@@ -514,13 +514,13 @@ bool Command::run_redirect(vector<string> storeCom)
 		input_close = true;		
 	}
 
-	if(isOutput == true)
+	if(isOutput == true)	//if output redirection exists
 	{
 		output = open(allComs.back().front().c_str(), O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR );
 		allComs.pop_back();
 		output_close = true;
 	}
-	else if(isOutput2 == true)
+	else if(isOutput2 == true) //Checks for which symbol is used ( > or >>)
 	{
 		output = open(allComs.back().front().c_str(), O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR );
 		allComs.pop_back();
@@ -543,10 +543,10 @@ bool Command::run_redirect(vector<string> storeCom)
 	{
 		pipe(redirect);			//Starts piping
 		pid = fork();
-		if(pid == 0)
+		if(pid == 0)	//Forks process
 		{
-			dup2(redirect_input,0);
-			if(z < allComs.size() - 1)			//ERROR COULD BE HERE --------------------------------------------------------------------
+			dup2(redirect_input,0); //handles duplication
+			if(z < allComs.size() - 1)
 			{
 				dup2(redirect[1],1);
 			}
@@ -559,9 +559,9 @@ bool Command::run_redirect(vector<string> storeCom)
 			for(unsigned int g = 0; g < allComs[z].size(); g++)
 			{
 				string st_temp = allComs[z][g];
-                		char* ch_temp = (char *)st_temp.c_str();
+                		char* ch_temp = (char *)st_temp.c_str();	//Converts from string to char*
                 		pointChar[g] = ch_temp;
-               			if(allComs[z].size() == 1)// || y == vecChar.size() - 1)
+               			if(allComs[z].size() == 1)
                 		{
                 			pointChar[g + 1] = '\0';
                 		}
@@ -570,7 +570,7 @@ bool Command::run_redirect(vector<string> storeCom)
                	 			pointChar[g + 1] = '\0';
 		      		}
 			}
-			wait = execvp(pointChar[0], pointChar);
+			wait = execvp(pointChar[0], pointChar);	//Runs commands
 			perror("execvp error");
 			return false;	
 		}
@@ -579,7 +579,7 @@ bool Command::run_redirect(vector<string> storeCom)
         	        perror("fork error");
 	                return false;
 	        }
-		else
+		else //Waits for child process
 		{
 			if(waitpid(pid, &wait, 0) != pid)
 			{
@@ -590,11 +590,11 @@ bool Command::run_redirect(vector<string> storeCom)
 			redirect_input = redirect[0];			
 		}
 	}
-	if(input_close == true)
+	if(input_close == true)	//Closes input if used
 	{
 		close(input);
 	}
-	if(output_close == true)
+	if(output_close == true) //Closes output if used
 	{
 		close(output);
 	}
