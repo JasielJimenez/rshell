@@ -78,6 +78,25 @@ unsigned int g = cLine.size() - 1;
         }
  }
 
+unsigned int q = newStr.size() - 1;	//Replaces pipe symbol with @ to make tokenizing easier
+int w = 0;
+string temp = newStr;
+for(unsigned int l = 0; l < q; l++)
+{
+	if(newStr.at(l) == '|' && newStr.at(l + 1) != '|')
+	{
+		temp = temp.substr(0, l + w);
+		temp = temp + " @";
+		temp = temp + newStr.substr(l, cLine.size() - l);
+
+		w = w + 2;
+	}
+}
+
+newStr = temp;
+
+//cout <<  "TEST FOR @ SYMBOL: " << newStr << endl;
+
 //Isolates parentheses--------------------------------------------------------------------------------------------------------------------------------
  //int f = 0;
  bool isParen = false;

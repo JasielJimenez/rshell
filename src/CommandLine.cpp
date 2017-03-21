@@ -222,7 +222,6 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		for(unsigned int y = var, z=0; y < vecChar.size(); y++, z++)
 		{
 			currRedirect = false;
-			cout << "vecChar[y]: " << vecChar[y] << endl;
 			for(unsigned int a = var; a != vecChar.size() && vecChar[a] != "\0"; a++)
 			{
 				//cout << "vecChar.size(): " << vecChar.size() << endl;
@@ -255,7 +254,6 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 				}
 				else //copies over current vector element
 				{	
-					//cout << vecChar[y];
 					string st_temp = vecChar[y];
 					char* ch_temp = (char *)st_temp.c_str();
 					pointChar[z] = ch_temp;
@@ -296,12 +294,10 @@ void Symbol::Reader(vector<string> vecChar,  vector<string> connect)
 		//cout << "comRed: " << comRed << endl;
 		if(global_connect == true && testExist == false && commandRedirect[comRed] == false)	//Runs commands <------------------------------------------------------------------------
 		{
-			cout << "-> normal" << endl;
 			comWorked = temp.run(pointChar, track);
 		}
 		else if(global_connect == true && testExist == false && commandRedirect[comRed] == true)//Runs commands with redirection <------------------------------------------------------- 
 		{
-			cout << "-> redirect" << endl;
 			comWorked = temp.run_redirect(storeCom);
 		}
 		global_connect = true;
@@ -405,7 +401,7 @@ bool Command::run(char** pointChar, int track) //run commands correctly
 	int temp;
 	
 	pid = fork();
-	
+
 	if(pid == 0)
 	{		
 		if(execvp(pointChar[0],pointChar) == -1)
@@ -486,7 +482,7 @@ bool Command::run_redirect(vector<string> storeCom)
                                 comPart.pop_back();
                         }
 		}
-		else if(storeCom[q] == "|")
+		else if(storeCom[q] == "@")
 		{
 			allComs.push_back(comPart);
 			isPipe = true;
@@ -498,6 +494,13 @@ bool Command::run_redirect(vector<string> storeCom)
 		else
 		{
 			comPart.push_back(storeCom.at(q));	//continues adding to vector until symbol is found
+	
+		//	Tests to see what is pushed back
+		//	for(unsigned int e = 0; e < comPart.size(); e++)
+		//	{
+		//		cout << comPart[e] << " ";
+		//	}
+		//	cout << endl;
 		}
 	}
 	allComs.push_back(comPart);	//adds remaining part of original command
@@ -523,7 +526,8 @@ bool Command::run_redirect(vector<string> storeCom)
 		allComs.pop_back();
 		output_close = true;
 	}
-	
+
+//	Tests to see what is in allComs vector	
 //	cout << endl;
 //	for(unsigned int i = 0; i < allComs.size(); i++)
 //	{
